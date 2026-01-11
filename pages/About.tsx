@@ -15,7 +15,7 @@ const About: React.FC = () => {
               subtitle="Specializing in the direct manufacture of high-performance disposable and reusable hospital garments."
             />
             <p className="text-lg text-slate-600 mb-8 leading-relaxed">
-              Founded on the principles of uncompromising protection, SteriPro has become a trusted partner for hospitals globally. We manage the entire lifecycle of hospital apparel—from sourcing specialized medical-grade textiles to the precision manufacturing of both single-use sterile kits and industrial-strength reusable gowns.
+              Founded on the principles of uncompromising protection, CareGuard has become a trusted partner for hospitals globally. We manage the entire lifecycle of hospital apparel—from sourcing specialized medical-grade textiles to the precision manufacturing of both single-use sterile kits and industrial-strength reusable gowns.
             </p>
             <div className="grid grid-cols-2 gap-8">
               <div className="flex items-center gap-3">
@@ -44,7 +44,7 @@ const About: React.FC = () => {
             </div>
             <div className="absolute -bottom-8 -right-8 bg-white p-8 rounded-2xl shadow-2xl border border-slate-100 max-w-xs">
               <p className="text-slate-900 font-bold italic">"We manufacture the armor for those who save lives, whether it's for one use or a hundred."</p>
-              <p className="mt-4 text-sm text-red-600 font-bold">— Operations Director, SteriPro</p>
+              <p className="mt-4 text-sm text-red-600 font-bold">— Operations Director, CareGuard</p>
             </div>
           </div>
         </div>

@@ -82,7 +82,7 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLogin }) => {
         </div>
 
         <p className="mt-8 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-          Secured by SteriPro Systems 2.4.0
+          Secured by CareGuard Systems 2.4.0
         </p>
       </div>
     </div>

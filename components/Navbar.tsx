@@ -31,10 +31,10 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate, isAdmin, onLog
             onClick={() => onNavigate('/')}
           >
             <div className="w-10 h-10 bg-red-600 rounded-lg flex items-center justify-center mr-3 group-hover:bg-red-700 transition-colors">
-              <span className="text-white font-bold text-xl">S</span>
+              <span className="text-white font-bold text-xl">C</span>
             </div>
             <span className="text-2xl font-bold tracking-tight text-slate-900">
-              Steri<span className="text-red-600">Pro</span>
+              Care<span className="text-red-600">Guard</span>
             </span>
           </div>
 

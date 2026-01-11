@@ -40,7 +40,7 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                 onClick={() => onNavigate('/contact')}
                 className="bg-white text-slate-900 border-2 border-slate-200 px-8 py-4 rounded-full font-bold text-lg hover:border-red-600 hover:text-red-600 transition-all text-center"
               >
-                Request Technical Samples
+                Request Technical Evaluation
               </button>
             </div>
             
@@ -60,7 +60,7 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
             <div className="relative z-10 rounded-2xl overflow-hidden shadow-2xl transform rotate-1 hover:rotate-0 transition-transform duration-500 bg-red-50/30 aspect-[4/3]">
               <img 
                 src="https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&q=80&w=1200" 
-                alt="Medical surgeon using SteriPro sterile gown in clinical theater" 
+                alt="Medical surgeon using CareGuard sterile gown in clinical theater" 
                 className="w-full h-full object-cover"
               />
             </div>
@@ -186,7 +186,7 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                  <div className="relative">
                     <img 
                       src="https://images.unsplash.com/photo-1581093588401-fbb62a02f120?auto=format&fit=crop&q=80&w=800" 
-                      alt="Scientific analysis of medical textiles for SteriPro products" 
+                      alt="Scientific analysis of medical textiles for CareGuard products" 
                       className="rounded-3xl shadow-2xl border border-white/10"
                     />
                     <div className="absolute -top-6 -right-6 bg-red-600 p-8 rounded-full shadow-2xl animate-pulse">

@@ -5,7 +5,7 @@ import {
   Search, Settings, Ruler, RotateCcw, Package, 
   Filter, AlertCircle, ChevronRight, CheckCircle2,
   FileText, Shield, Info, Layers, ListChecks,
-  Image as ImageIcon, LogOut, FileDown, Calendar,
+  ImageIcon, LogOut, FileDown, Calendar,
   MessageSquare, User as UserIcon, Calendar as CalendarIcon,
   Building, Table
 } from 'lucide-react';
@@ -170,7 +170,7 @@ const Admin: React.FC<AdminProps> = ({
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.setAttribute("href", url);
-    link.setAttribute("download", `SteriPro_Quote_Requests_${new Date().toISOString().split('T')[0]}.csv`);
+    link.setAttribute("download", `CareGuard_Quote_Requests_${new Date().toISOString().split('T')[0]}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

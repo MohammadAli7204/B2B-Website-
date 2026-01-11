@@ -19,34 +19,34 @@ const INITIAL_CATEGORIES = ['Sterile', 'Protective', 'Consumables', 'Custom'];
 const App: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<string>('/');
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState<boolean>(() => {
-    return sessionStorage.getItem('steripro_admin_auth') === 'true';
+    return sessionStorage.getItem('careguard_admin_auth') === 'true';
   });
   
   const [products, setProducts] = useState<Product[]>(() => {
-    const saved = localStorage.getItem('steripro_products');
+    const saved = localStorage.getItem('careguard_products');
     return saved ? JSON.parse(saved) : INITIAL_PRODUCTS;
   });
 
   const [categories, setCategories] = useState<string[]>(() => {
-    const saved = localStorage.getItem('steripro_categories');
+    const saved = localStorage.getItem('careguard_categories');
     return saved ? JSON.parse(saved) : INITIAL_CATEGORIES;
   });
 
   const [inquiries, setInquiries] = useState<InquiryData[]>(() => {
-    const saved = localStorage.getItem('steripro_inquiries');
+    const saved = localStorage.getItem('careguard_inquiries');
     return saved ? JSON.parse(saved) : [];
   });
 
   useEffect(() => {
-    localStorage.setItem('steripro_products', JSON.stringify(products));
+    localStorage.setItem('careguard_products', JSON.stringify(products));
   }, [products]);
 
   useEffect(() => {
-    localStorage.setItem('steripro_categories', JSON.stringify(categories));
+    localStorage.setItem('careguard_categories', JSON.stringify(categories));
   }, [categories]);
 
   useEffect(() => {
-    localStorage.setItem('steripro_inquiries', JSON.stringify(inquiries));
+    localStorage.setItem('careguard_inquiries', JSON.stringify(inquiries));
   }, [inquiries]);
 
   useEffect(() => {
@@ -70,11 +70,11 @@ const App: React.FC = () => {
 
   const handleAdminLogin = (user: string, pass: string) => {
     const TARGET_USERNAME = 'admin';
-    const TARGET_PASSWORD = 'steripro2024';
+    const TARGET_PASSWORD = 'careguard2024';
 
     if (user === TARGET_USERNAME && pass === TARGET_PASSWORD) {
       setIsAdminAuthenticated(true);
-      sessionStorage.setItem('steripro_admin_auth', 'true');
+      sessionStorage.setItem('careguard_admin_auth', 'true');
       return true;
     }
     return false;
@@ -82,7 +82,7 @@ const App: React.FC = () => {
 
   const handleAdminLogout = () => {
     setIsAdminAuthenticated(false);
-    sessionStorage.removeItem('steripro_admin_auth');
+    sessionStorage.removeItem('careguard_admin_auth');
     navigate('/');
   };
 
@@ -132,9 +132,9 @@ const App: React.FC = () => {
       setProducts(INITIAL_PRODUCTS);
       setCategories(INITIAL_CATEGORIES);
       setInquiries([]);
-      localStorage.removeItem('steripro_products');
-      localStorage.removeItem('steripro_categories');
-      localStorage.removeItem('steripro_inquiries');
+      localStorage.removeItem('careguard_products');
+      localStorage.removeItem('careguard_categories');
+      localStorage.removeItem('careguard_inquiries');
     }
   };
 

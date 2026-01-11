@@ -40,7 +40,6 @@ export interface InquiryData {
   productName: string;
   name: string;
   email: string;
-  company: string;
   quantity: string;
   message: string;
   requirement: string;

@@ -14,10 +14,10 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
           <div className="space-y-6">
             <div className="flex items-center cursor-pointer group" onClick={() => onNavigate('/')}>
               <div className="w-8 h-8 bg-red-600 rounded flex items-center justify-center mr-2 group-hover:bg-red-700 transition-colors">
-                <span className="text-white font-bold">S</span>
+                <span className="text-white font-bold">C</span>
               </div>
               <span className="text-xl font-bold text-slate-900 tracking-tight">
-                Steri<span className="text-red-600">Pro</span>
+                Care<span className="text-red-600">Guard</span>
               </span>
             </div>
             <p className="text-slate-500 leading-relaxed max-w-xs">
@@ -49,7 +49,7 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
           <div>
             <h4 className="text-slate-900 font-bold mb-6 uppercase tracking-widest text-xs">Resources</h4>
             <ul className="space-y-4 text-sm font-medium">
-              <li><button onClick={() => onNavigate('/about')} className="hover:text-red-600 transition-colors flex items-center gap-2"><FileText size={14} /> Knowledge Base</button></li>
+              <li><button onClick={() => onNavigate('/blog')} className="hover:text-red-600 transition-colors flex items-center gap-2"><FileText size={14} /> Knowledge Base</button></li>
               <li><button onClick={() => onNavigate('/contact')} className="hover:text-red-600 transition-colors flex items-center gap-2"><Globe size={14} /> Technical Support</button></li>
               <li><button onClick={() => onNavigate('/products')} className="hover:text-red-600 transition-colors">Sitemap</button></li>
               <li><button onClick={() => onNavigate('/admin')} className="text-red-600 font-bold hover:underline flex items-center gap-2"><UserCog size={14} /> Admin Panel (Testing)</button></li>
@@ -73,7 +73,7 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
         </div>
 
         <div className="border-t border-slate-100 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-slate-400">
-          <p>© 2024 SteriPro. All rights reserved by WorkWithAli.</p>
+          <p>© 2024 CareGuard. All rights reserved by WorkWithAli.</p>
           <div className="flex space-x-6 mt-4 md:mt-0">
             <button className="hover:text-red-600 transition-colors">Privacy Policy</button>
             <button className="hover:text-red-600 transition-colors">Terms of Compliance</button>
