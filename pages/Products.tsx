@@ -43,7 +43,7 @@ const Products: React.FC<ProductsProps> = ({ products, categories, onNavigate })
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
-                className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${
+                className={`px-6 py-2 rounded-full text-sm font-bold transition-all active:scale-95 ${
                   activeCategory === cat 
                   ? 'bg-red-600 text-white shadow-md' 
                   : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
@@ -59,60 +59,66 @@ const Products: React.FC<ProductsProps> = ({ products, categories, onNavigate })
             <input 
               type="text" 
               placeholder="Search products..."
-              className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:bg-white transition-all"
+              className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:bg-white transition-all shadow-inner"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
         </div>
 
-        <div className="mb-8 flex justify-between items-end">
-          <p className="text-slate-500 font-medium">
+        <div className="mb-8 flex justify-between items-end px-2">
+          <p className="text-slate-500 font-medium text-sm">
             Showing <span className="text-slate-900 font-bold">{filteredProducts.length}</span> results
           </p>
-          <button className="flex items-center text-red-600 font-bold text-sm hover:underline">
+          <button className="flex items-center text-red-600 font-bold text-xs uppercase tracking-widest hover:text-red-700 transition-colors">
             <Download className="w-4 h-4 mr-2" /> Download Catalog PDF
           </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 section-optimized">
           {filteredProducts.map(product => (
             <div 
               key={product.id} 
-              className="bg-white rounded-3xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-2xl transition-all duration-300 flex flex-col cursor-pointer"
+              className="bg-white rounded-3xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-2xl transition-all duration-500 flex flex-col cursor-pointer transform hover:-translate-y-1 group"
               onClick={() => onNavigate(`/product/${product.id}`)}
             >
-              <div className="relative h-72">
-                <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
-                   <button className="w-full bg-white text-slate-900 py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-red-50">
+              <div className="relative aspect-[3/4] overflow-hidden bg-slate-100">
+                <img 
+                    src={product.image} 
+                    alt={product.name} 
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
+                    loading="lazy"
+                    decoding="async"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
+                   <button className="w-full bg-white text-slate-900 py-3 rounded-xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-red-50 active:scale-95 transition-all">
                      <ExternalLink className="w-4 h-4" /> View Details
                    </button>
                 </div>
-                <div className="absolute top-4 right-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-[10px] font-bold text-slate-900 uppercase tracking-widest">
+                <div className="absolute top-4 right-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-[10px] font-black text-slate-900 uppercase tracking-widest shadow-sm">
                   {product.category}
                 </div>
               </div>
               
               <div className="p-8 flex-grow flex flex-col">
-                <h3 className="text-2xl font-bold text-slate-900 mb-4">{product.name}</h3>
-                <p className="text-slate-600 mb-6 line-clamp-2">{product.description}</p>
+                <h3 className="text-2xl font-black text-slate-900 mb-4 group-hover:text-red-600 transition-colors">{product.name}</h3>
+                <p className="text-slate-600 mb-6 line-clamp-2 text-sm leading-relaxed">{product.description}</p>
                 
                 <div className="space-y-3 mb-8">
                   {product.features.map((feature, i) => (
-                    <div key={i} className="flex items-center text-sm text-slate-500">
-                      <div className="w-1.5 h-1.5 bg-red-500 rounded-full mr-3"></div>
+                    <div key={i} className="flex items-center text-xs font-medium text-slate-500">
+                      <div className="w-1.5 h-1.5 bg-red-500 rounded-full mr-3 group-hover:scale-125 transition-transform"></div>
                       {feature}
                     </div>
                   ))}
                 </div>
                 
                 <div className="mt-auto pt-6 border-t border-slate-100 flex items-center justify-between">
-                  <span className="text-red-600 font-bold hover:text-red-700 transition-colors flex items-center group">
+                  <span className="text-red-600 font-black text-xs uppercase tracking-widest hover:text-red-700 transition-colors flex items-center gap-2">
                     Learn More
-                    <ArrowRight className="ml-1 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </span>
-                  <button onClick={(e) => { e.stopPropagation(); }} className="bg-slate-50 p-2 rounded-lg text-slate-400 hover:text-red-600 transition-colors">
+                  <button onClick={(e) => { e.stopPropagation(); }} className="bg-slate-50 p-2.5 rounded-xl text-slate-400 hover:text-red-600 hover:bg-red-50 transition-all active:scale-90">
                     <Download className="w-5 h-5" />
                   </button>
                 </div>
@@ -122,12 +128,15 @@ const Products: React.FC<ProductsProps> = ({ products, categories, onNavigate })
         </div>
 
         {filteredProducts.length === 0 && (
-          <div className="text-center py-20">
-            <h3 className="text-2xl font-bold text-slate-900 mb-2">No products found</h3>
-            <p className="text-slate-500">Try adjusting your filters or search query.</p>
+          <div className="text-center py-32 animate-in zoom-in duration-300">
+            <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-6 text-slate-300">
+                <Search size={32} />
+            </div>
+            <h3 className="text-2xl font-black text-slate-900 mb-2">No results found</h3>
+            <p className="text-slate-500 font-medium">Try adjusting your filters or search query.</p>
             <button 
               onClick={() => {setActiveCategory('All'); setSearchQuery('');}}
-              className="mt-6 text-red-600 font-bold hover:underline"
+              className="mt-8 bg-slate-900 text-white px-8 py-3 rounded-xl font-bold hover:bg-red-600 transition-all active:scale-95"
             >
               Clear all filters
             </button>

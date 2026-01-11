@@ -22,17 +22,19 @@ const CertificatesSlider: React.FC = () => {
       </div>
       
       <div className="flex relative">
-        <div className="flex animate-scroll whitespace-nowrap gap-6 items-center">
+        <div className="flex animate-scroll whitespace-nowrap gap-6 items-center gpu-accelerated">
           {items.map((cert, idx) => (
             <div 
               key={idx} 
               className="inline-flex flex-col items-center justify-center min-w-[120px] group"
             >
-              <div className="w-16 h-16 bg-white border border-slate-200 rounded-full p-0 shadow-sm group-hover:shadow-md group-hover:border-red-200 transition-all duration-300 flex items-center justify-center overflow-hidden grayscale group-hover:grayscale-0 opacity-60 group-hover:opacity-100 aspect-square">
+              <div className="w-16 h-16 bg-white border border-slate-200 rounded-full p-0 shadow-sm group-hover:shadow-lg group-hover:border-red-400 group-hover:scale-110 transition-all duration-300 flex items-center justify-center overflow-hidden grayscale group-hover:grayscale-0 opacity-60 group-hover:opacity-100 aspect-square">
                 <img 
                   src={cert.icon} 
                   alt={cert.name} 
                   className="w-full h-full object-cover"
+                  loading="lazy"
+                  decoding="async"
                 />
               </div>
               <div className="mt-2 text-center">
@@ -46,13 +48,14 @@ const CertificatesSlider: React.FC = () => {
 
       <style>{`
         @keyframes scroll {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(calc(-50% - 0.75rem)); }
+          0% { transform: translate3d(0, 0, 0); }
+          100% { transform: translate3d(calc(-50% - 0.75rem), 0, 0); }
         }
         .animate-scroll {
-          animation: scroll 30s linear infinite;
+          animation: scroll 40s linear infinite;
           display: flex;
           width: max-content;
+          will-change: transform;
         }
         .animate-scroll:hover {
           animation-play-state: paused;
@@ -60,8 +63,8 @@ const CertificatesSlider: React.FC = () => {
       `}</style>
       
       {/* Side Fades */}
-      <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-slate-50 to-transparent z-10"></div>
-      <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-slate-50 to-transparent z-10"></div>
+      <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-slate-50 to-transparent z-10 pointer-events-none"></div>
+      <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-slate-50 to-transparent z-10 pointer-events-none"></div>
     </div>
   );
 };

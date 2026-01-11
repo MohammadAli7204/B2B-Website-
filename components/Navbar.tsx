@@ -16,21 +16,27 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate, isAdmin, onLog
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
+      // Use requestAnimationFrame for smoother state updates if logic gets more complex
+      const isScrolled = window.scrollY > 20;
+      if (isScrolled !== scrolled) {
+        setScrolled(isScrolled);
+      }
     };
-    window.addEventListener('scroll', handleScroll);
+    
+    // Using passive: true improves scrolling performance
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [scrolled]);
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'glass-nav shadow-sm py-3' : 'bg-transparent py-5'}`}>
+    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 transform translate-z-0 ${scrolled ? 'glass-nav shadow-sm py-3' : 'bg-transparent py-5'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center">
           <div 
             className="flex items-center cursor-pointer group"
             onClick={() => onNavigate('/')}
           >
-            <div className="w-10 h-10 bg-red-600 rounded-lg flex items-center justify-center mr-3 group-hover:bg-red-700 transition-colors">
+            <div className="w-10 h-10 bg-red-600 rounded-lg flex items-center justify-center mr-3 group-hover:bg-red-700 transition-colors shadow-lg shadow-red-200">
               <span className="text-white font-bold text-xl">C</span>
             </div>
             <span className="text-2xl font-bold tracking-tight text-slate-900">
@@ -71,7 +77,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate, isAdmin, onLog
             ) : (
               <button 
                 onClick={() => onNavigate('/contact')}
-                className="bg-slate-900 text-white px-6 py-2.5 rounded-full text-xs font-black uppercase tracking-widest hover:bg-red-600 transition-all flex items-center group shadow-xl"
+                className="bg-slate-900 text-white px-6 py-2.5 rounded-full text-xs font-black uppercase tracking-widest hover:bg-red-600 transition-all flex items-center group shadow-xl active:scale-95"
               >
                 Get a Quote
                 <ChevronRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -80,7 +86,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate, isAdmin, onLog
           </div>
 
           <div className="md:hidden">
-            <button onClick={() => setIsOpen(!isOpen)} className="text-slate-600 hover:text-slate-900 p-2">
+            <button onClick={() => setIsOpen(!isOpen)} className="text-slate-600 hover:text-slate-900 p-2 active:scale-90 transition-transform">
               {isOpen ? <X /> : <Menu />}
             </button>
           </div>
@@ -122,7 +128,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate, isAdmin, onLog
               }
               setIsOpen(false);
             }}
-            className={`w-full ${isAdmin ? 'bg-slate-100 text-slate-900' : 'bg-red-600 text-white'} px-4 py-4 rounded-xl font-black uppercase tracking-widest text-xs transition-colors`}
+            className={`w-full ${isAdmin ? 'bg-slate-100 text-slate-900' : 'bg-red-600 text-white'} px-4 py-4 rounded-xl font-black uppercase tracking-widest text-xs transition-colors shadow-lg active:scale-95`}
           >
             {isAdmin ? 'Logout' : 'Get a Quote'}
           </button>
