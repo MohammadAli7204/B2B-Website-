@@ -1,0 +1,7 @@
+{
+  "name": "SteriPro B2B Solutions",
+  "description": "A premium, modern B2B website for medical apparel and industrial sterilization solutions, built with React and Tailwind CSS.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
