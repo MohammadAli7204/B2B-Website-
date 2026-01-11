@@ -1,23 +1,32 @@
 
 import React, { useState } from 'react';
-import { Lock, User, ShieldAlert, ArrowRight, ShieldCheck } from 'lucide-react';
+import { Lock, User, ShieldAlert, ArrowRight, ShieldCheck, Loader2 } from 'lucide-react';
 
 interface AdminLoginProps {
-  onLogin: (user: string, pass: string) => boolean;
+  onLogin: (user: string, pass: string) => Promise<boolean>;
 }
 
 const AdminLogin: React.FC<AdminLoginProps> = ({ onLogin }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(false);
+  const [isAuthenticating, setIsAuthenticating] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const success = onLogin(username, password);
-    if (!success) {
+    setIsAuthenticating(true);
+    
+    try {
+      const success = await onLogin(username, password);
+      if (!success) {
+        setError(true);
+        setPassword('');
+        setTimeout(() => setError(false), 3000);
+      }
+    } catch (err) {
       setError(true);
-      setPassword('');
-      setTimeout(() => setError(false), 3000);
+    } finally {
+      setIsAuthenticating(false);
     }
   };
 
@@ -35,11 +44,12 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLogin }) => {
         <div className="bg-white p-10 rounded-[2.5rem] shadow-2xl border border-slate-200">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Username</label>
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Username / Email</label>
               <div className="relative">
                 <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={20} />
                 <input
                   required
+                  disabled={isAuthenticating}
                   type="text"
                   className="w-full pl-12 pr-4 py-4 rounded-2xl border border-slate-100 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-red-500 outline-none transition-all font-medium"
                   placeholder="admin_id"
@@ -55,6 +65,7 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLogin }) => {
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={20} />
                 <input
                   required
+                  disabled={isAuthenticating}
                   type="password"
                   className="w-full pl-12 pr-4 py-4 rounded-2xl border border-slate-100 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-red-500 outline-none transition-all font-medium"
                   placeholder="••••••••"
@@ -67,22 +78,23 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLogin }) => {
             {error && (
               <div className="bg-red-50 border border-red-100 p-4 rounded-xl flex items-center gap-3 animate-in shake duration-300">
                 <ShieldAlert className="text-red-600" size={18} />
-                <span className="text-xs font-bold text-red-700 uppercase tracking-wider">Invalid Credentials</span>
+                <span className="text-xs font-bold text-red-700 uppercase tracking-wider">Authentication Failure</span>
               </div>
             )}
 
             <button
               type="submit"
-              className="w-full bg-slate-900 text-white font-black py-4 rounded-2xl shadow-xl hover:bg-red-600 transition-all flex items-center justify-center gap-3 group tracking-widest text-sm"
+              disabled={isAuthenticating}
+              className="w-full bg-slate-900 text-white font-black py-4 rounded-2xl shadow-xl hover:bg-red-600 disabled:bg-slate-300 transition-all flex items-center justify-center gap-3 group tracking-widest text-sm"
             >
-              AUTHENTICATE
-              <ArrowRight className="group-hover:translate-x-1 transition-transform" size={18} />
+              {isAuthenticating ? <Loader2 size={18} className="animate-spin" /> : 'AUTHENTICATE'}
+              {!isAuthenticating && <ArrowRight className="group-hover:translate-x-1 transition-transform" size={18} />}
             </button>
           </form>
         </div>
 
         <p className="mt-8 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-          Secured by CareGuard Systems 2.4.0
+          Cloud Authentication via Supabase
         </p>
       </div>
     </div>

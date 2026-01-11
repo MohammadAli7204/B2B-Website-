@@ -1,0 +1,8 @@
+
+<svg width="400" height="500" viewBox="0 0 400 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="400" height="500" fill="#F8FAFC"/>
+  <path d="M200 100L120 130V180L100 200V400H300V200L280 180V130L200 100Z" fill="#E2E8F0"/>
+  <path d="M200 100L240 115M200 100L160 115" stroke="#CBD5E1" stroke-width="2"/>
+  <rect x="140" y="220" width="120" height="150" rx="2" stroke="#CBD5E1" stroke-width="1" stroke-dasharray="4 4"/>
+  <text x="200" y="450" text-anchor="middle" font-family="Inter, sans-serif" font-weight="800" font-size="12" fill="#94A3B8" letter-spacing="0.2em">PRODUCT IMAGE PENDING</text>
+</svg>

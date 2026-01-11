@@ -16,14 +16,12 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate, isAdmin, onLog
 
   useEffect(() => {
     const handleScroll = () => {
-      // Use requestAnimationFrame for smoother state updates if logic gets more complex
       const isScrolled = window.scrollY > 20;
       if (isScrolled !== scrolled) {
         setScrolled(isScrolled);
       }
     };
     
-    // Using passive: true improves scrolling performance
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, [scrolled]);
@@ -36,8 +34,8 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate, isAdmin, onLog
             className="flex items-center cursor-pointer group"
             onClick={() => onNavigate('/')}
           >
-            <div className="w-10 h-10 bg-red-600 rounded-lg flex items-center justify-center mr-3 group-hover:bg-red-700 transition-colors shadow-lg shadow-red-200">
-              <span className="text-white font-bold text-xl">C</span>
+            <div className="mr-3 group-hover:scale-110 transition-transform duration-300">
+              <img src="/images/logo.svg" alt="CareGuard Logo" className="w-10 h-10 shadow-lg shadow-red-200 rounded-lg" />
             </div>
             <span className="text-2xl font-bold tracking-tight text-slate-900">
               Care<span className="text-red-600">Guard</span>
