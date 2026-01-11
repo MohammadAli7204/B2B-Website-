@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Mail, Phone, MapPin, Linkedin, Twitter, Facebook, ArrowRight, FileText, Globe } from 'lucide-react';
+import { Mail, Phone, MapPin, Linkedin, Twitter, Facebook, ArrowRight, FileText, Globe, UserCog } from 'lucide-react';
 
 interface FooterProps {
   onNavigate: (path: string) => void;
@@ -52,7 +52,7 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
               <li><button onClick={() => onNavigate('/about')} className="hover:text-red-600 transition-colors flex items-center gap-2"><FileText size={14} /> Knowledge Base</button></li>
               <li><button onClick={() => onNavigate('/contact')} className="hover:text-red-600 transition-colors flex items-center gap-2"><Globe size={14} /> Technical Support</button></li>
               <li><button onClick={() => onNavigate('/products')} className="hover:text-red-600 transition-colors">Sitemap</button></li>
-              <li><button onClick={() => onNavigate('/about')} className="hover:text-red-600 transition-colors">Company Bio</button></li>
+              <li><button onClick={() => onNavigate('/admin')} className="text-red-600 font-bold hover:underline flex items-center gap-2"><UserCog size={14} /> Admin Panel (Testing)</button></li>
             </ul>
           </div>
 

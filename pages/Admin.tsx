@@ -7,7 +7,7 @@ import {
   FileText, Shield, Info, Layers, ListChecks,
   Image as ImageIcon, LogOut, FileDown, Calendar,
   MessageSquare, User as UserIcon, Calendar as CalendarIcon,
-  Building
+  Building, Table
 } from 'lucide-react';
 import SectionTitle from '../components/SectionTitle';
 import { Product, SizeChartEntry, InquiryData } from '../types';
@@ -250,7 +250,7 @@ const Admin: React.FC<AdminProps> = ({
   const updateSizeRow = (index: number, field: keyof SizeChartEntry, value: string) => {
     const currentChart = [...(formProduct.sizeChart || [])];
     currentChart[index] = { ...currentChart[index], [field]: value };
-    setFormProduct({ ...formProduct, sizeChart: currentChart });
+    setFormProduct(prev => ({ ...prev, sizeChart: currentChart }));
   };
 
   const removeSizeRow = (index: number) => {
@@ -421,7 +421,7 @@ const Admin: React.FC<AdminProps> = ({
             </div>
 
             <form onSubmit={handleProductSubmit} className="p-10 space-y-16">
-              {/* Identity & Technical specs (rest of form logic) */}
+              {/* Identity & Technical specs */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
                 <div className="lg:col-span-2 space-y-8">
                   <div className="flex items-center gap-3 mb-2">
@@ -495,6 +495,79 @@ const Admin: React.FC<AdminProps> = ({
                        </div>
                     ))}
                  </div>
+              </div>
+
+              {/* Dimensional Specifications (Size Chart) */}
+              <div className="space-y-8 bg-slate-50 p-8 rounded-[2.5rem] border border-slate-100">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                   <div className="flex items-center gap-3">
+                     <Ruler size={20} className="text-red-600" />
+                     <h4 className="font-black text-sm uppercase tracking-widest">Dimensional Specifications</h4>
+                   </div>
+                   <div className="flex flex-wrap gap-2">
+                      <button type="button" onClick={loadSizeTemplate} className="text-[10px] font-black text-slate-500 bg-white hover:text-slate-900 px-4 py-2 rounded-xl border border-slate-200 uppercase tracking-widest transition-all">
+                        Load Standard Template
+                      </button>
+                      <button type="button" onClick={addSizeRow} className="text-[10px] font-black text-red-600 bg-white hover:bg-red-50 px-4 py-2 rounded-xl border border-red-200 uppercase tracking-widest transition-all">
+                        + Add Custom Size Row
+                      </button>
+                   </div>
+                </div>
+
+                {formProduct.sizeChart && formProduct.sizeChart.length > 0 ? (
+                  <div className="overflow-hidden border border-slate-200 rounded-2xl bg-white shadow-sm">
+                    <table className="w-full text-left">
+                      <thead>
+                        <tr className="bg-slate-100/50">
+                          <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Label</th>
+                          <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Inches</th>
+                          <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">CM</th>
+                          <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {formProduct.sizeChart.map((row, idx) => (
+                          <tr key={idx} className="hover:bg-slate-50 transition-colors">
+                            <td className="px-4 py-2">
+                              <input 
+                                className="w-full bg-transparent border-none focus:ring-0 text-sm font-black text-slate-900 uppercase" 
+                                value={row.label} 
+                                placeholder="Label (e.g. XL)"
+                                onChange={e => updateSizeRow(idx, 'label', e.target.value)} 
+                              />
+                            </td>
+                            <td className="px-4 py-2">
+                              <input 
+                                className="w-full bg-transparent border-none focus:ring-0 text-sm font-medium text-slate-600" 
+                                value={row.inches} 
+                                placeholder="36-38"
+                                onChange={e => updateSizeRow(idx, 'inches', e.target.value)} 
+                              />
+                            </td>
+                            <td className="px-4 py-2">
+                              <input 
+                                className="w-full bg-transparent border-none focus:ring-0 text-sm font-medium text-slate-600" 
+                                value={row.cm} 
+                                placeholder="91-96"
+                                onChange={e => updateSizeRow(idx, 'cm', e.target.value)} 
+                              />
+                            </td>
+                            <td className="px-6 py-2 text-right">
+                              <button type="button" onClick={() => removeSizeRow(idx)} className="text-slate-300 hover:text-red-600 transition-colors">
+                                <Trash size={16} />
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <div className="py-12 border-2 border-dashed border-slate-200 rounded-[2rem] text-center bg-white/50">
+                     <Ruler className="mx-auto mb-3 text-slate-300" size={32} />
+                     <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">No dimensional data defined. Use template or add manually.</p>
+                  </div>
+                )}
               </div>
 
               {/* Specifications & Matrix */}
