@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Product, InquiryData } from '../types';
 import SectionTitle from '../components/SectionTitle';
-import { Send, Mail, User, Info, Package, ShieldCheck, CheckCircle2, ChevronRight } from 'lucide-react';
+import { Send, Mail, User, Info, Package, ShieldCheck, CheckCircle2, ChevronRight, Building } from 'lucide-react';
 
 interface InquiryProps {
   product: Product;
@@ -10,9 +10,13 @@ interface InquiryProps {
 }
 
 const Inquiry: React.FC<InquiryProps> = ({ product, onAddInquiry }) => {
+  /**
+   * Fix: Added company to the initial form state to capture organizational context.
+   */
   const [formState, setFormState] = useState({
     name: '',
     email: '',
+    company: '',
     quantity: '100'
   });
   const [submitted, setSubmitted] = useState(false);
@@ -20,12 +24,16 @@ const Inquiry: React.FC<InquiryProps> = ({ product, onAddInquiry }) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    /**
+     * Fix: Populate the company property in the inquiry data object before submission.
+     */
     const newInquiry: InquiryData = {
       id: Date.now().toString(),
       productId: product.id,
       productName: product.name,
       name: formState.name,
       email: formState.email,
+      company: formState.company,
       quantity: formState.quantity,
       message: 'Direct Inquiry',
       requirement: 'Standard',
@@ -147,6 +155,20 @@ const Inquiry: React.FC<InquiryProps> = ({ product, onAddInquiry }) => {
                           placeholder="saiyedmohammadali56@gmail.com"
                           value={formState.email}
                           onChange={e => setFormState({...formState, email: e.target.value})}
+                        />
+                      </div>
+
+                      {/* Fix: Added Company field to the inquiry form UI */}
+                      <div>
+                        <label className={labelClasses}>
+                          <Building size={12} className="inline mr-1 mb-0.5 text-red-600" /> Company / Institution
+                        </label>
+                        <input 
+                          required
+                          className={inputClasses}
+                          placeholder="St. Mary's Hospital"
+                          value={formState.company}
+                          onChange={e => setFormState({...formState, company: e.target.value})}
                         />
                       </div>
 

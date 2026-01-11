@@ -1,6 +1,6 @@
 
 import React, { useState, useMemo } from 'react';
-import { Search, Download, ExternalLink, ArrowRight } from 'lucide-react';
+import { Search, ExternalLink, ArrowRight } from 'lucide-react';
 import { Product } from '../types';
 import SectionTitle from '../components/SectionTitle';
 
@@ -70,9 +70,6 @@ const Products: React.FC<ProductsProps> = ({ products, categories, onNavigate })
           <p className="text-slate-500 font-medium text-sm">
             Showing <span className="text-slate-900 font-bold">{filteredProducts.length}</span> results
           </p>
-          <button className="flex items-center text-red-600 font-bold text-xs uppercase tracking-widest hover:text-red-700 transition-colors">
-            <Download className="w-4 h-4 mr-2" /> Download Catalog PDF
-          </button>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 section-optimized">
@@ -118,9 +115,6 @@ const Products: React.FC<ProductsProps> = ({ products, categories, onNavigate })
                     Learn More
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </span>
-                  <button onClick={(e) => { e.stopPropagation(); }} className="bg-slate-50 p-2.5 rounded-xl text-slate-400 hover:text-red-600 hover:bg-red-50 transition-all active:scale-90">
-                    <Download className="w-5 h-5" />
-                  </button>
                 </div>
               </div>
             </div>

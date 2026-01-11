@@ -34,12 +34,18 @@ export interface BlogPost {
   image: string;
 }
 
+/**
+ * Fix: Added company field to InquiryData interface.
+ * This resolves TypeScript errors in Admin.tsx where inq.company was being accessed
+ * for both CSV export and table display.
+ */
 export interface InquiryData {
   id: string;
   productId: string;
   productName: string;
   name: string;
   email: string;
+  company: string;
   quantity: string;
   message: string;
   requirement: string;

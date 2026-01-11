@@ -11,6 +11,7 @@ import Admin from './pages/Admin';
 import ProductDetail from './pages/ProductDetail';
 import Inquiry from './pages/Inquiry';
 import AdminLogin from './components/AdminLogin';
+import CursorFollower from './components/CursorFollower';
 import { PRODUCTS as INITIAL_PRODUCTS } from './constants';
 import { Product, InquiryData } from './types';
 
@@ -187,7 +188,8 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col selection:bg-red-100 selection:text-red-900">
+    <div className="min-h-screen flex flex-col selection:bg-red-100 selection:text-red-900 cursor-none">
+      <CursorFollower />
       <Navbar currentPage={currentPage} onNavigate={navigate} isAdmin={isAdminAuthenticated} onLogout={handleAdminLogout} />
       
       <main className="flex-grow">
@@ -213,6 +215,24 @@ const App: React.FC = () => {
         body.scrolled #back-to-top {
           opacity: 1;
           visibility: visible;
+        }
+        /* Hide system cursor globally */
+        * {
+          cursor: none !important;
+        }
+        /* Custom scrollbar to match the design */
+        ::-webkit-scrollbar {
+          width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+          background: #f8fafc;
+        }
+        ::-webkit-scrollbar-thumb {
+          background: #e2e8f0;
+          border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+          background: #cbd5e1;
         }
       `}</style>
       

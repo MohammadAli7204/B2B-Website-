@@ -12,13 +12,13 @@ interface HomeProps {
 const Home: React.FC<HomeProps> = ({ onNavigate }) => {
   return (
     <div className="animate-in fade-in duration-700">
-      {/* Hero Section */}
-      <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
+      {/* Full-Width Hero Section */}
+      <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden w-full">
         <div className="absolute top-0 right-0 -z-10 w-1/2 h-full bg-slate-50 rounded-bl-[100px]"></div>
         <div className="absolute -top-24 -right-24 w-96 h-96 bg-red-100 rounded-full blur-3xl opacity-30"></div>
         
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row items-center">
-          <div className="lg:w-1/2 mb-12 lg:mb-0">
+        <div className="w-full px-6 md:px-12 lg:px-20 flex flex-col lg:flex-row items-center gap-12 lg:gap-24">
+          <div className="lg:w-5/12 mb-12 lg:mb-0">
             <div className="inline-flex items-center px-3 py-1 rounded-full bg-red-50 border border-red-100 text-red-700 text-xs font-bold uppercase tracking-wider mb-6">
               Certified B2B Garment Manufacturer
             </div>
@@ -56,8 +56,8 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
             </div>
           </div>
           
-          <div className="lg:w-1/2 relative">
-            <div className="relative z-10 rounded-2xl overflow-hidden shadow-2xl transform rotate-1 hover:rotate-0 transition-transform duration-500 bg-red-50/30 aspect-[4/3]">
+          <div className="lg:w-7/12 relative">
+            <div className="relative z-10 rounded-[3rem] overflow-hidden shadow-2xl transform rotate-1 hover:rotate-0 transition-transform duration-500 bg-red-50/30 aspect-[16/10] lg:aspect-[16/9]">
               <img 
                 src="https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&q=80&w=1200" 
                 alt="Medical surgeon using CareGuard sterile gown" 
@@ -66,14 +66,15 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                 decoding="sync"
               />
             </div>
-            <div className="absolute -bottom-10 -left-10 z-20 bg-white p-6 rounded-2xl shadow-xl hidden md:block border border-slate-100">
-              <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center text-red-600 shadow-inner">
-                  <ShieldCheck size={28} />
+            {/* Standards Badge */}
+            <div className="absolute -bottom-6 -right-6 lg:-bottom-10 lg:-right-10 z-20 bg-white p-6 lg:p-8 rounded-[2rem] shadow-2xl hidden md:block border border-slate-100">
+              <div className="flex items-center space-x-5">
+                <div className="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center text-red-600 shadow-inner">
+                  <ShieldCheck size={32} />
                 </div>
                 <div>
-                  <p className="text-xs text-slate-500 font-bold uppercase tracking-widest">Global Standards</p>
-                  <p className="text-lg font-bold text-slate-900">AAMI PB70 & EN13795</p>
+                  <p className="text-xs text-slate-400 font-black uppercase tracking-widest mb-1">Global Standards</p>
+                  <p className="text-xl font-black text-slate-900">AAMI PB70 & EN13795</p>
                 </div>
               </div>
             </div>

@@ -12,34 +12,35 @@ const CERTIFICATES = [
 ];
 
 const CertificatesSlider: React.FC = () => {
-  // Double the array for seamless infinite loop
-  const items = [...CERTIFICATES, ...CERTIFICATES];
+  // Triple the array to ensure the screen is always filled during the scroll reset
+  const items = [...CERTIFICATES, ...CERTIFICATES, ...CERTIFICATES];
 
   return (
-    <div className="bg-slate-50/50 border-t border-slate-100 py-6 overflow-hidden relative">
-      <div className="max-w-7xl mx-auto px-4 mb-3 text-center">
-        <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.4em]">Global Compliance Registry</span>
+    <div className="bg-slate-50/50 border-t border-slate-100 py-10 overflow-hidden relative">
+      <div className="max-w-7xl mx-auto px-4 mb-6 text-center">
+        <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em]">Verified Compliance Standards</span>
       </div>
       
-      <div className="flex relative">
-        <div className="flex animate-scroll whitespace-nowrap gap-6 items-center gpu-accelerated">
+      <div className="flex relative w-full">
+        {/* The container width is determined by children. TranslateX(-33.33%) because we tripled the items */}
+        <div className="flex animate-scroll-infinite whitespace-nowrap items-center gpu-accelerated">
           {items.map((cert, idx) => (
             <div 
               key={idx} 
-              className="inline-flex flex-col items-center justify-center min-w-[120px] group"
+              className="inline-flex flex-col items-center justify-center px-10 group flex-shrink-0"
             >
-              <div className="w-16 h-16 bg-white border border-slate-200 rounded-full p-0 shadow-sm group-hover:shadow-lg group-hover:border-red-400 group-hover:scale-110 transition-all duration-300 flex items-center justify-center overflow-hidden grayscale group-hover:grayscale-0 opacity-60 group-hover:opacity-100 aspect-square">
+              <div className="w-20 h-20 bg-white border border-slate-200 rounded-2xl p-4 shadow-sm group-hover:shadow-xl group-hover:border-red-400 group-hover:scale-110 transition-all duration-500 flex items-center justify-center overflow-hidden grayscale group-hover:grayscale-0 opacity-60 group-hover:opacity-100">
                 <img 
                   src={cert.icon} 
                   alt={cert.name} 
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain"
                   loading="lazy"
                   decoding="async"
                 />
               </div>
-              <div className="mt-2 text-center">
-                <p className="text-[8px] font-black text-slate-900 uppercase tracking-widest">{cert.name}</p>
-                <p className="text-[7px] font-bold text-slate-400 uppercase tracking-tighter mt-0.5 opacity-0 group-hover:opacity-100 transition-opacity">{cert.label}</p>
+              <div className="mt-3 text-center">
+                <p className="text-[9px] font-black text-slate-900 uppercase tracking-widest">{cert.name}</p>
+                <p className="text-[8px] font-bold text-slate-400 uppercase tracking-tighter mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">{cert.label}</p>
               </div>
             </div>
           ))}
@@ -47,24 +48,24 @@ const CertificatesSlider: React.FC = () => {
       </div>
 
       <style>{`
-        @keyframes scroll {
+        @keyframes scroll-infinite {
           0% { transform: translate3d(0, 0, 0); }
-          100% { transform: translate3d(calc(-50% - 0.75rem), 0, 0); }
+          100% { transform: translate3d(calc(-100% / 3), 0, 0); }
         }
-        .animate-scroll {
-          animation: scroll 40s linear infinite;
+        .animate-scroll-infinite {
+          animation: scroll-infinite 35s linear infinite;
           display: flex;
           width: max-content;
           will-change: transform;
         }
-        .animate-scroll:hover {
+        .animate-scroll-infinite:hover {
           animation-play-state: paused;
         }
       `}</style>
       
-      {/* Side Fades */}
-      <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-slate-50 to-transparent z-10 pointer-events-none"></div>
-      <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-slate-50 to-transparent z-10 pointer-events-none"></div>
+      {/* Visual edge smoothing */}
+      <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-slate-50 to-transparent z-10 pointer-events-none"></div>
+      <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-slate-50 to-transparent z-10 pointer-events-none"></div>
     </div>
   );
 };
