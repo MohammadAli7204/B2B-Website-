@@ -23,6 +23,19 @@ export interface Product {
   };
 }
 
+export interface InquiryData {
+  id: string;
+  productId: string;
+  productName: string;
+  name: string;
+  email: string;
+  company: string;
+  quantity: string;
+  message: string;
+  requirement: string;
+  timestamp: string; // ISO string
+}
+
 export interface Testimonial {
   id: string;
   name: string;

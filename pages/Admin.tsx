@@ -5,19 +5,23 @@ import {
   Search, Settings, Ruler, RotateCcw, Package, 
   Filter, AlertCircle, ChevronRight, CheckCircle2,
   FileText, Shield, Info, Layers, ListChecks,
-  Image as ImageIcon, LogOut
+  Image as ImageIcon, LogOut, FileDown, Calendar,
+  MessageSquare, User as UserIcon, Calendar as CalendarIcon,
+  Building
 } from 'lucide-react';
 import SectionTitle from '../components/SectionTitle';
-import { Product, SizeChartEntry } from '../types';
+import { Product, SizeChartEntry, InquiryData } from '../types';
 
 interface AdminProps {
   products: Product[];
   categories: string[];
+  inquiries: InquiryData[];
   onAddProduct: (product: Product) => void;
   onUpdateProduct: (product: Product) => void;
   onAddCategory: (category: string) => void;
   onDeleteCategory: (category: string) => void;
   onDeleteProduct: (id: string) => void;
+  onDeleteInquiry: (id: string) => void;
   onResetData: () => void;
   onLogout?: () => void;
 }
@@ -25,20 +29,27 @@ interface AdminProps {
 const Admin: React.FC<AdminProps> = ({ 
   products, 
   categories, 
+  inquiries,
   onAddProduct, 
   onUpdateProduct,
   onAddCategory, 
   onDeleteCategory,
   onDeleteProduct,
+  onDeleteInquiry,
   onResetData,
   onLogout
 }) => {
+  const [activeTab, setActiveTab] = useState<'INVENTORY' | 'INQUIRIES'>('INVENTORY');
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isManagingCategories, setIsManagingCategories] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState('');
   const [adminSearchTerm, setAdminSearchTerm] = useState('');
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  
+  // Inquiry Filtering State
+  const [inquiryDateStart, setInquiryDateStart] = useState('');
+  const [inquiryDateEnd, setInquiryDateEnd] = useState('');
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
@@ -71,6 +82,23 @@ const Admin: React.FC<AdminProps> = ({
       p.category.toLowerCase().includes(adminSearchTerm.toLowerCase())
     );
   }, [products, adminSearchTerm]);
+
+  const filteredInquiries = useMemo(() => {
+    return inquiries.filter(inq => {
+      const date = new Date(inq.timestamp);
+      const start = inquiryDateStart ? new Date(inquiryDateStart) : null;
+      const end = inquiryDateEnd ? new Date(inquiryDateEnd) : null;
+      
+      if (start && date < start) return false;
+      if (end) {
+        // Set end to end of day
+        const endOfSelectedDay = new Date(end);
+        endOfSelectedDay.setHours(23, 59, 59, 999);
+        if (date > endOfSelectedDay) return false;
+      }
+      return true;
+    });
+  }, [inquiries, inquiryDateStart, inquiryDateEnd]);
 
   const showFeedback = (msg: string) => {
     setSuccessMessage(msg);
@@ -115,6 +143,40 @@ const Admin: React.FC<AdminProps> = ({
     resetForm();
   };
 
+  const downloadCSV = () => {
+    if (filteredInquiries.length === 0) {
+      alert("No data found for the selected date range.");
+      return;
+    }
+
+    const headers = ["Timestamp", "Product Name", "Requester Name", "Email", "Company", "Quantity", "Requirement", "Message"];
+    const rows = filteredInquiries.map(inq => [
+      new Date(inq.timestamp).toLocaleString(),
+      inq.productName,
+      inq.name,
+      inq.email,
+      inq.company,
+      inq.quantity,
+      inq.requirement,
+      `"${inq.message.replace(/"/g, '""')}"`
+    ]);
+
+    const csvContent = [
+      headers.join(","),
+      ...rows.map(r => r.join(","))
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `SteriPro_Quote_Requests_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    showFeedback('Excel/CSV Export Initialized');
+  };
+
   const startEdit = (product: Product) => {
     setEditingId(product.id);
     setFormProduct({
@@ -135,7 +197,6 @@ const Admin: React.FC<AdminProps> = ({
     resetForm();
   };
 
-  // Gallery Management
   const handleGalleryUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const fileList = e.target.files;
     if (!fileList) return;
@@ -159,7 +220,6 @@ const Admin: React.FC<AdminProps> = ({
     }));
   };
 
-  // Feature Management
   const addFeature = () => {
     setFormProduct(prev => ({
       ...prev,
@@ -180,7 +240,6 @@ const Admin: React.FC<AdminProps> = ({
     }));
   };
 
-  // Size Chart Management
   const addSizeRow = () => {
     setFormProduct(prev => ({
       ...prev,
@@ -259,6 +318,7 @@ const Admin: React.FC<AdminProps> = ({
             </button>
             <button 
               onClick={() => {
+                setActiveTab('INVENTORY');
                 if (isAdding && !editingId) {
                   cancelAction();
                 } else {
@@ -285,6 +345,25 @@ const Admin: React.FC<AdminProps> = ({
           </div>
         </div>
 
+        {/* Tab Navigation */}
+        <div className="flex border-b border-slate-200 mb-8 overflow-x-auto">
+           <button 
+              onClick={() => { setActiveTab('INVENTORY'); setIsAdding(false); }}
+              className={`px-8 py-4 text-sm font-black uppercase tracking-widest transition-all relative ${activeTab === 'INVENTORY' ? 'text-red-600' : 'text-slate-400 hover:text-slate-600'}`}
+           >
+             Inventory
+             {activeTab === 'INVENTORY' && <div className="absolute bottom-0 left-0 right-0 h-1 bg-red-600 rounded-t-full"></div>}
+           </button>
+           <button 
+              onClick={() => { setActiveTab('INQUIRIES'); setIsAdding(false); }}
+              className={`px-8 py-4 text-sm font-black uppercase tracking-widest transition-all relative ${activeTab === 'INQUIRIES' ? 'text-red-600' : 'text-slate-400 hover:text-slate-600'}`}
+           >
+             Quote Inquiries
+             {inquiries.length > 0 && <span className="ml-2 bg-slate-100 text-slate-400 text-[10px] px-2 py-1 rounded-full">{inquiries.length}</span>}
+             {activeTab === 'INQUIRIES' && <div className="absolute bottom-0 left-0 right-0 h-1 bg-red-600 rounded-t-full"></div>}
+           </button>
+        </div>
+
         {/* Feedback Alert */}
         {successMessage && (
           <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-[100] bg-slate-900 text-white px-8 py-4 rounded-full shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-bottom-4">
@@ -293,8 +372,8 @@ const Admin: React.FC<AdminProps> = ({
           </div>
         )}
 
-        {/* Categories Manager */}
-        {isManagingCategories && (
+        {/* Categories Manager (Only in Inventory Tab) */}
+        {activeTab === 'INVENTORY' && isManagingCategories && (
           <div className="bg-white p-10 rounded-[2.5rem] border border-slate-200 shadow-xl mb-12 animate-in slide-in-from-top-4 duration-300">
             <div className="flex items-center justify-between mb-8">
                <h3 className="text-2xl font-black flex items-center gap-3 text-slate-900">
@@ -323,8 +402,8 @@ const Admin: React.FC<AdminProps> = ({
           </div>
         )}
 
-        {/* Master Form */}
-        {isAdding && (
+        {/* Master Form (Only in Inventory Tab) */}
+        {activeTab === 'INVENTORY' && isAdding && (
           <div ref={formRef} className="bg-white rounded-[3rem] border border-slate-200 shadow-2xl mb-12 animate-in slide-in-from-top-6 duration-500 overflow-hidden">
             <div className="px-10 py-8 bg-slate-900 text-white flex items-center justify-between">
               <div className="flex items-center gap-4">
@@ -342,7 +421,7 @@ const Admin: React.FC<AdminProps> = ({
             </div>
 
             <form onSubmit={handleProductSubmit} className="p-10 space-y-16">
-              {/* Section 1: Basic Identity & Images */}
+              {/* Identity & Technical specs (rest of form logic) */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
                 <div className="lg:col-span-2 space-y-8">
                   <div className="flex items-center gap-3 mb-2">
@@ -392,7 +471,7 @@ const Admin: React.FC<AdminProps> = ({
                 </div>
               </div>
 
-              {/* Section 2: Product Gallery */}
+              {/* Product Gallery */}
               <div className="space-y-8">
                  <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
@@ -415,15 +494,10 @@ const Admin: React.FC<AdminProps> = ({
                           </div>
                        </div>
                     ))}
-                    {(formProduct.extraImages || []).length === 0 && (
-                       <div className="col-span-full py-12 text-center bg-slate-50 border border-dashed border-slate-200 rounded-[2rem] text-slate-400 font-bold text-[10px] uppercase tracking-widest">
-                          No additional views registered.
-                       </div>
-                    )}
                  </div>
               </div>
 
-              {/* Section 3: Technical Specifications */}
+              {/* Specifications & Matrix */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
                  <div className="space-y-8">
                     <div className="flex items-center justify-between">
@@ -467,44 +541,6 @@ const Admin: React.FC<AdminProps> = ({
                  </div>
               </div>
 
-              {/* Section 4: Size Matrix */}
-              <div className="space-y-8">
-                 <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <Ruler size={20} className="text-red-600" />
-                      <h4 className="font-black text-sm uppercase tracking-widest">Dimensional Matrix</h4>
-                    </div>
-                    <button type="button" onClick={loadSizeTemplate} className="text-[10px] font-black text-slate-400 hover:text-red-600 border border-slate-200 px-4 py-2 rounded-xl uppercase tracking-widest transition-all">Apply Standard Template</button>
-                 </div>
-                 <div className="overflow-hidden border border-slate-200 rounded-[2rem] bg-slate-50">
-                    <table className="w-full text-left text-xs">
-                       <thead className="bg-slate-100 text-slate-400 uppercase tracking-widest font-black">
-                          <tr>
-                             <th className="px-8 py-5">Classification</th>
-                             <th className="px-8 py-5">Imperial (In)</th>
-                             <th className="px-8 py-5">Metric (Cm)</th>
-                             <th className="px-8 py-5 text-right">Kill</th>
-                          </tr>
-                       </thead>
-                       <tbody className="divide-y divide-slate-200 bg-white">
-                          {(formProduct.sizeChart || []).map((row, index) => (
-                             <tr key={index} className="group hover:bg-slate-50/50">
-                                <td className="px-8 py-4"><input value={row.label} onChange={e => updateSizeRow(index, 'label', e.target.value)} className="w-full bg-slate-50 rounded-xl p-3 outline-red-500 font-black text-slate-900" placeholder="Size" /></td>
-                                <td className="px-8 py-4"><input value={row.inches} onChange={e => updateSizeRow(index, 'inches', e.target.value)} className="w-full bg-slate-50 rounded-xl p-3 outline-red-500" placeholder="00-00" /></td>
-                                <td className="px-8 py-4"><input value={row.cm} onChange={e => updateSizeRow(index, 'cm', e.target.value)} className="w-full bg-slate-50 rounded-xl p-3 outline-red-500" placeholder="00-00" /></td>
-                                <td className="px-8 py-4 text-right">
-                                   <button type="button" onClick={() => removeSizeRow(index)} className="text-slate-200 hover:text-red-600 transition-colors p-3 bg-white rounded-xl border border-slate-100 shadow-sm"><Trash size={18} /></button>
-                                </td>
-                             </tr>
-                          ))}
-                       </tbody>
-                    </table>
-                    <button type="button" onClick={addSizeRow} className="w-full py-6 text-[10px] font-black text-red-600 bg-slate-50 hover:bg-slate-100 uppercase tracking-[0.3em] transition-colors flex items-center justify-center gap-2">
-                       <Plus size={14} /> NEW SIZE VARIANT
-                    </button>
-                 </div>
-              </div>
-
               <div className="flex flex-col md:flex-row gap-6 pt-12 border-t border-slate-100">
                 <button type="submit" className="flex-grow bg-red-600 text-white font-black py-6 rounded-[1.5rem] shadow-2xl hover:bg-red-700 transition-all flex items-center justify-center gap-4 text-xl tracking-tighter">
                   <Save size={28} /> {editingId ? 'COMMIT MODIFICATIONS' : 'AUTHORIZE REGISTRATION'}
@@ -517,92 +553,225 @@ const Admin: React.FC<AdminProps> = ({
           </div>
         )}
 
-        {/* Dashboard Inventory */}
-        <div className="bg-white rounded-[3rem] border border-slate-200 overflow-hidden shadow-sm">
-          <div className="p-10 border-b border-slate-100 flex flex-col lg:flex-row justify-between items-center gap-8">
-            <div className="flex items-center gap-5">
-              <div className="w-16 h-16 bg-slate-900 rounded-[1.5rem] flex items-center justify-center text-white shadow-xl">
-                <Package size={32} />
+        {/* INVENTORY TABLE VIEW */}
+        {activeTab === 'INVENTORY' && !isAdding && (
+          <div className="bg-white rounded-[3rem] border border-slate-200 overflow-hidden shadow-sm animate-in fade-in duration-300">
+            <div className="p-10 border-b border-slate-100 flex flex-col lg:flex-row justify-between items-center gap-8">
+              <div className="flex items-center gap-5">
+                <div className="w-16 h-16 bg-slate-900 rounded-[1.5rem] flex items-center justify-center text-white shadow-xl">
+                  <Package size={32} />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-black text-slate-900 tracking-tight">Active Master Registry</h3>
+                  <p className="text-sm text-slate-400 font-bold uppercase tracking-widest">{products.length} Items Validated</p>
+                </div>
               </div>
-              <div>
-                <h3 className="text-2xl font-black text-slate-900 tracking-tight">Active Master Registry</h3>
-                <p className="text-sm text-slate-400 font-bold uppercase tracking-widest">{products.length} Items Validated</p>
+              <div className="relative w-full lg:w-[400px]">
+                <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" size={24} />
+                <input 
+                  type="text" 
+                  placeholder="Find garment record..." 
+                  className="w-full pl-14 pr-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-lg font-medium focus:outline-none focus:ring-4 focus:ring-red-500/10 focus:bg-white transition-all placeholder:text-slate-300"
+                  value={adminSearchTerm}
+                  onChange={e => setAdminSearchTerm(e.target.value)}
+                />
               </div>
             </div>
-            <div className="relative w-full lg:w-[400px]">
-              <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" size={24} />
-              <input 
-                type="text" 
-                placeholder="Find garment record..." 
-                className="w-full pl-14 pr-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-lg font-medium focus:outline-none focus:ring-4 focus:ring-red-500/10 focus:bg-white transition-all placeholder:text-slate-300"
-                value={adminSearchTerm}
-                onChange={e => setAdminSearchTerm(e.target.value)}
-              />
-            </div>
-          </div>
-          
-          <div className="overflow-x-auto">
-            <table className="w-full text-left">
-              <thead>
-                <tr className="bg-slate-50/50">
-                  <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Garment Identity</th>
-                  <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Classification</th>
-                  <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Gallery</th>
-                  <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-right">Registry Controls</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {filteredAdminProducts.map(p => (
-                  <tr key={p.id} className={`transition-all group ${editingId === p.id ? 'bg-red-50/30' : 'hover:bg-slate-50/30'}`}>
-                    <td className="px-10 py-6">
-                      <div className="flex items-center gap-6">
-                        <div className="w-16 h-16 rounded-[1.25rem] bg-white overflow-hidden flex-shrink-0 border border-slate-100 shadow-md transition-transform group-hover:scale-105">
-                          <img src={p.image} className="w-full h-full object-cover" alt="" />
-                        </div>
-                        <div className="flex flex-col">
-                          <span className="font-black text-slate-900 text-lg leading-tight">{p.name}</span>
-                          <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">UUID: {p.id.slice(-8)}</span>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-10 py-6">
-                      <span className="inline-flex items-center px-5 py-2 bg-white text-slate-600 text-[10px] font-black uppercase rounded-full tracking-widest border border-slate-200 shadow-sm group-hover:border-red-200 group-hover:text-red-600 transition-all">
-                        {p.category}
-                      </span>
-                    </td>
-                    <td className="px-10 py-6">
-                       <div className="flex items-center gap-1.5">
-                          {[p.image, ...(p.extraImages || [])].slice(0, 3).map((img, i) => (
-                             <div key={i} className="w-6 h-8 rounded bg-slate-100 border border-slate-200 overflow-hidden">
-                                <img src={img} className="w-full h-full object-cover" alt="" />
-                             </div>
-                          ))}
-                       </div>
-                    </td>
-                    <td className="px-10 py-6 text-right">
-                      <div className="flex justify-end gap-3">
-                        <button 
-                          onClick={() => startEdit(p)} 
-                          className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-black text-xs transition-all ${editingId === p.id ? 'bg-red-600 text-white shadow-lg' : 'bg-white text-slate-400 border border-slate-100 shadow-sm hover:bg-slate-900 hover:text-white'}`}
-                        >
-                          <Edit size={16} />
-                          <span className="hidden sm:inline uppercase">Modify</span>
-                        </button>
-                        <button 
-                          onClick={() => confirmDeleteProduct(p.id, p.name)} 
-                          className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-black text-xs bg-white text-slate-400 border border-slate-100 shadow-sm hover:bg-red-600 hover:text-white transition-all"
-                        >
-                          <Trash size={16} />
-                          <span className="hidden sm:inline uppercase">Kill</span>
-                        </button>
-                      </div>
-                    </td>
+            
+            <div className="overflow-x-auto">
+              <table className="w-full text-left">
+                <thead>
+                  <tr className="bg-slate-50/50">
+                    <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Garment Identity</th>
+                    <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Classification</th>
+                    <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-right">Registry Controls</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {filteredAdminProducts.map(p => (
+                    <tr key={p.id} className="transition-all group hover:bg-slate-50/30">
+                      <td className="px-10 py-6">
+                        <div className="flex items-center gap-6">
+                          <div className="w-16 h-16 rounded-[1.25rem] bg-white border border-slate-100 shadow-md">
+                            <img src={p.image} className="w-full h-full object-cover rounded-[1.25rem]" alt="" />
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="font-black text-slate-900 text-lg leading-tight">{p.name}</span>
+                            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">UUID: {p.id.slice(-8)}</span>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-10 py-6">
+                        <span className="inline-flex items-center px-5 py-2 bg-white text-slate-600 text-[10px] font-black uppercase rounded-full tracking-widest border border-slate-200 shadow-sm">{p.category}</span>
+                      </td>
+                      <td className="px-10 py-6 text-right">
+                        <div className="flex justify-end gap-3">
+                          <button onClick={() => startEdit(p)} className="p-3 bg-white text-slate-400 border border-slate-100 rounded-xl shadow-sm hover:bg-slate-900 hover:text-white transition-all"><Edit size={16} /></button>
+                          <button onClick={() => confirmDeleteProduct(p.id, p.name)} className="p-3 bg-white text-slate-400 border border-slate-100 rounded-xl shadow-sm hover:bg-red-600 hover:text-white transition-all"><Trash size={16} /></button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
+        )}
+
+        {/* INQUIRIES TAB VIEW */}
+        {activeTab === 'INQUIRIES' && (
+          <div className="animate-in fade-in duration-300">
+            {/* Inquiry Controls / Filters */}
+            <div className="bg-white rounded-[3rem] border border-slate-200 shadow-xl overflow-hidden mb-12">
+               <div className="p-10 border-b border-slate-100 bg-slate-900 text-white flex flex-col lg:flex-row justify-between items-center gap-8">
+                  <div className="flex items-center gap-5">
+                    <div className="w-16 h-16 bg-red-600 rounded-[1.5rem] flex items-center justify-center text-white shadow-xl">
+                      <FileDown size={32} />
+                    </div>
+                    <div>
+                      <h3 className="text-2xl font-black tracking-tight">Export Intelligence</h3>
+                      <p className="text-sm text-slate-400 font-bold uppercase tracking-widest">Quote Analytics & Request History</p>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={downloadCSV}
+                    className="flex items-center gap-3 bg-white text-slate-900 px-8 py-4 rounded-2xl font-black text-sm uppercase tracking-[0.2em] shadow-2xl hover:bg-red-600 hover:text-white transition-all"
+                  >
+                    <FileDown size={20} />
+                    Download Excel/CSV
+                  </button>
+               </div>
+               
+               <div className="p-10 bg-slate-50 border-b border-slate-100 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                  <div className="space-y-2">
+                    <label className={labelClasses}>
+                      <CalendarIcon size={12} className="inline mr-1" /> Start Date
+                    </label>
+                    <input 
+                      type="date" 
+                      className={inputClasses}
+                      value={inquiryDateStart}
+                      onChange={e => setInquiryDateStart(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className={labelClasses}>
+                      <CalendarIcon size={12} className="inline mr-1" /> End Date
+                    </label>
+                    <input 
+                      type="date" 
+                      className={inputClasses}
+                      value={inquiryDateEnd}
+                      onChange={e => setInquiryDateEnd(e.target.value)}
+                    />
+                  </div>
+                  <div className="lg:col-span-2 flex items-end">
+                    <button 
+                      onClick={() => { setInquiryDateStart(''); setInquiryDateEnd(''); }}
+                      className="px-6 py-3 text-xs font-black text-slate-400 uppercase tracking-widest hover:text-red-600 transition-colors"
+                    >
+                      Clear Calendar Filter
+                    </button>
+                  </div>
+               </div>
+            </div>
+
+            {/* Inquiries Table */}
+            <div className="bg-white rounded-[3rem] border border-slate-200 shadow-sm overflow-hidden">
+               <div className="p-10 border-b border-slate-100">
+                  <p className="text-sm text-slate-400 font-bold uppercase tracking-widest">
+                    Displaying <span className="text-slate-900">{filteredInquiries.length}</span> Quote Requests
+                  </p>
+               </div>
+               <div className="overflow-x-auto">
+                  <table className="w-full text-left">
+                     <thead>
+                        <tr className="bg-slate-50/50">
+                           <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Requester Details</th>
+                           <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Product & Qty</th>
+                           <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Company</th>
+                           <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Request Date</th>
+                           <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-right">Action</th>
+                        </tr>
+                     </thead>
+                     <tbody className="divide-y divide-slate-100">
+                        {filteredInquiries.map((inq) => (
+                           <tr key={inq.id} className="group hover:bg-slate-50/30 transition-all">
+                              <td className="px-10 py-8">
+                                 <div className="flex flex-col">
+                                    <span className="font-black text-slate-900 text-lg flex items-center gap-2">
+                                       <UserIcon size={16} className="text-red-600" />
+                                       {inq.name}
+                                    </span>
+                                    <span className="text-sm text-slate-500 font-medium">{inq.email}</span>
+                                 </div>
+                              </td>
+                              <td className="px-10 py-8">
+                                 <div className="flex flex-col">
+                                    <span className="font-bold text-slate-900 text-sm truncate max-w-[200px]">{inq.productName}</span>
+                                    <div className="flex gap-2 mt-1">
+                                       <span className="text-[10px] px-2 py-0.5 bg-slate-100 rounded text-slate-500 font-black uppercase tracking-tighter">QTY: {inq.quantity}</span>
+                                       <span className="text-[10px] px-2 py-0.5 bg-red-50 rounded text-red-600 font-black uppercase tracking-tighter">{inq.requirement}</span>
+                                    </div>
+                                 </div>
+                              </td>
+                              <td className="px-10 py-8">
+                                 <div className="flex items-center gap-2 text-slate-600 font-bold text-sm">
+                                    <Building size={16} className="text-slate-300" />
+                                    {inq.company}
+                                 </div>
+                              </td>
+                              <td className="px-10 py-8">
+                                 <div className="flex flex-col">
+                                    <span className="text-xs font-black text-slate-900">{new Date(inq.timestamp).toLocaleDateString()}</span>
+                                    <span className="text-[10px] text-slate-400 uppercase font-bold">{new Date(inq.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                                 </div>
+                              </td>
+                              <td className="px-10 py-8 text-right">
+                                 <div className="flex justify-end gap-2">
+                                    <button 
+                                      onClick={() => {
+                                        const msg = `Message from ${inq.name}:\n\n${inq.message}\n\nRequirement: ${inq.requirement}\nQuantity: ${inq.quantity}`;
+                                        alert(msg);
+                                      }}
+                                      className="p-3 bg-white text-slate-400 border border-slate-100 rounded-xl hover:text-slate-900 hover:border-slate-300 transition-all"
+                                      title="View Message"
+                                    >
+                                       <MessageSquare size={16} />
+                                    </button>
+                                    <button 
+                                      onClick={() => { if(window.confirm('Delete this inquiry record?')) onDeleteInquiry(inq.id); }}
+                                      className="p-3 bg-white text-slate-400 border border-slate-100 rounded-xl hover:text-red-600 hover:border-red-200 transition-all"
+                                      title="Delete"
+                                    >
+                                       <Trash size={16} />
+                                    </button>
+                                 </div>
+                              </td>
+                           </tr>
+                        ))}
+                        {filteredInquiries.length === 0 && (
+                           <tr>
+                              <td colSpan={5} className="px-10 py-24 text-center">
+                                 <div className="flex flex-col items-center">
+                                    <Info size={48} className="text-slate-200 mb-4" />
+                                    <p className="text-slate-400 font-black uppercase tracking-widest text-sm">No quote requests found for this period.</p>
+                                    <button 
+                                      onClick={() => { setInquiryDateStart(''); setInquiryDateEnd(''); }}
+                                      className="mt-4 text-red-600 font-bold hover:underline text-sm"
+                                    >
+                                      Reset filters
+                                    </button>
+                                 </div>
+                              </td>
+                           </tr>
+                        )}
+                     </tbody>
+                  </table>
+               </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

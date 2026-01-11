@@ -1,14 +1,15 @@
 
 import React, { useState } from 'react';
-import { Product } from '../types';
+import { Product, InquiryData } from '../types';
 import SectionTitle from '../components/SectionTitle';
 import { Send, Building, Mail, User, Info, Package, ShieldCheck, CheckCircle2 } from 'lucide-react';
 
 interface InquiryProps {
   product: Product;
+  onAddInquiry: (inquiry: InquiryData) => void;
 }
 
-const Inquiry: React.FC<InquiryProps> = ({ product }) => {
+const Inquiry: React.FC<InquiryProps> = ({ product, onAddInquiry }) => {
   const [formState, setFormState] = useState({
     name: '',
     email: '',
@@ -22,8 +23,22 @@ const Inquiry: React.FC<InquiryProps> = ({ product }) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    const newInquiry: InquiryData = {
+      id: Date.now().toString(),
+      productId: product.id,
+      productName: product.name,
+      name: formState.name,
+      email: formState.email,
+      company: formState.company,
+      quantity: formState.quantity,
+      message: formState.message,
+      requirement: formState.requirement,
+      timestamp: new Date().toISOString()
+    };
+
+    onAddInquiry(newInquiry);
     setSubmitted(true);
-    // Logic for sending inquiry would go here
   };
 
   const inputClasses = "w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-red-500 outline-none transition-all bg-slate-50 focus:bg-white text-slate-900 font-medium placeholder:text-slate-300";
@@ -108,7 +123,7 @@ const Inquiry: React.FC<InquiryProps> = ({ product }) => {
                       <input 
                         required
                         className={inputClasses}
-                        placeholder="Authorized Representative"
+                        placeholder="Mohammad Ali"
                         value={formState.name}
                         onChange={e => setFormState({...formState, name: e.target.value})}
                       />
@@ -121,7 +136,7 @@ const Inquiry: React.FC<InquiryProps> = ({ product }) => {
                         required
                         type="email"
                         className={inputClasses}
-                        placeholder="name@institution.com"
+                        placeholder="saiyedmohammadali56@gmail.com"
                         value={formState.email}
                         onChange={e => setFormState({...formState, email: e.target.value})}
                       />

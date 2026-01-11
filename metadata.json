@@ -1,6 +1,7 @@
 {
-  "name": "SteriPro B2B Solutions",
-  "description": "A premium, modern B2B website for medical apparel and industrial sterilization solutions, built with React and Tailwind CSS.",
+  "name": "SteriPro | Professional Medical & Industrial Apparel Manufacturer",
+  "description": "Premium B2B manufacturer specializing in high-barrier sterile disposable and reusable hospital garments. AAMI PB70 and ISO 13485 certified PPE solutions for healthcare and industrial sectors.",
+  "keywords": "medical apparel, surgical gowns, isolation gowns, sterile PPE, reusable scrubs, hospital supplies manufacturer, cleanroom apparel",
   "requestFramePermissions": [
     "geolocation"
   ]

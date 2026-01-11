@@ -11,7 +11,7 @@ import ProductDetail from './pages/ProductDetail';
 import Inquiry from './pages/Inquiry';
 import AdminLogin from './components/AdminLogin';
 import { PRODUCTS as INITIAL_PRODUCTS } from './constants';
-import { Product } from './types';
+import { Product, InquiryData } from './types';
 
 const INITIAL_CATEGORIES = ['Sterile', 'Protective', 'Consumables', 'Custom'];
 
@@ -21,7 +21,6 @@ const App: React.FC = () => {
     return sessionStorage.getItem('steripro_admin_auth') === 'true';
   });
   
-  // Initialize state from LocalStorage or use defaults
   const [products, setProducts] = useState<Product[]>(() => {
     const saved = localStorage.getItem('steripro_products');
     return saved ? JSON.parse(saved) : INITIAL_PRODUCTS;
@@ -32,7 +31,11 @@ const App: React.FC = () => {
     return saved ? JSON.parse(saved) : INITIAL_CATEGORIES;
   });
 
-  // Persist state changes to LocalStorage whenever products or categories change
+  const [inquiries, setInquiries] = useState<InquiryData[]>(() => {
+    const saved = localStorage.getItem('steripro_inquiries');
+    return saved ? JSON.parse(saved) : [];
+  });
+
   useEffect(() => {
     localStorage.setItem('steripro_products', JSON.stringify(products));
   }, [products]);
@@ -40,6 +43,10 @@ const App: React.FC = () => {
   useEffect(() => {
     localStorage.setItem('steripro_categories', JSON.stringify(categories));
   }, [categories]);
+
+  useEffect(() => {
+    localStorage.setItem('steripro_inquiries', JSON.stringify(inquiries));
+  }, [inquiries]);
 
   useEffect(() => {
     const handleHashChange = () => {
@@ -60,13 +67,9 @@ const App: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  /**
-   * ADMIN CREDENTIALS CONFIGURATION
-   * Change the strings below to update your username and password.
-   */
   const handleAdminLogin = (user: string, pass: string) => {
-    const TARGET_USERNAME = 'admin'; // <--- Change this username
-    const TARGET_PASSWORD = 'steripro2024'; // <--- Change this password
+    const TARGET_USERNAME = 'admin';
+    const TARGET_PASSWORD = 'steripro2024';
 
     if (user === TARGET_USERNAME && pass === TARGET_PASSWORD) {
       setIsAdminAuthenticated(true);
@@ -115,12 +118,22 @@ const App: React.FC = () => {
     }));
   };
 
+  const addInquiry = (inquiry: InquiryData) => {
+    setInquiries(prev => [inquiry, ...prev]);
+  };
+
+  const deleteInquiry = (id: string) => {
+    setInquiries(prev => prev.filter(i => i.id !== id));
+  };
+
   const resetData = () => {
     if (window.confirm('WARNING: This will restore the original catalog and categories. All your custom data and deletions will be lost. Proceed?')) {
       setProducts(INITIAL_PRODUCTS);
       setCategories(INITIAL_CATEGORIES);
+      setInquiries([]);
       localStorage.removeItem('steripro_products');
       localStorage.removeItem('steripro_categories');
+      localStorage.removeItem('steripro_inquiries');
     }
   };
 
@@ -134,7 +147,7 @@ const App: React.FC = () => {
     if (currentPage.startsWith('/inquiry/')) {
       const id = currentPage.split('/').pop();
       const product = products.find(p => p.id === id);
-      return product ? <Inquiry product={product} /> : <div className="pt-40 text-center">Product not found</div>;
+      return product ? <Inquiry product={product} onAddInquiry={addInquiry} /> : <div className="pt-40 text-center">Product not found</div>;
     }
 
     switch (currentPage) {
@@ -154,11 +167,13 @@ const App: React.FC = () => {
           <Admin 
             products={products} 
             categories={categories} 
+            inquiries={inquiries}
             onAddProduct={addProduct} 
             onUpdateProduct={updateProduct}
             onAddCategory={addCategory} 
             onDeleteCategory={deleteCategory}
             onDeleteProduct={deleteProduct}
+            onDeleteInquiry={deleteInquiry}
             onResetData={resetData}
             onLogout={handleAdminLogout}
           />
