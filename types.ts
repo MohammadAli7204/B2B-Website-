@@ -23,6 +23,17 @@ export interface Product {
   };
 }
 
+export interface BlogPost {
+  id: string;
+  title: string;
+  excerpt: string;
+  content: string;
+  author: string;
+  date: string;
+  category: 'Technical' | 'Industry' | 'Sustainability';
+  image: string;
+}
+
 export interface InquiryData {
   id: string;
   productId: string;

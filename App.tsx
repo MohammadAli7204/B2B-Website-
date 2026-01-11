@@ -5,6 +5,7 @@ import Footer from './components/Footer';
 import Home from './pages/Home';
 import About from './pages/About';
 import Products from './pages/Products';
+import Blog from './pages/Blog';
 import Contact from './pages/Contact';
 import Admin from './pages/Admin';
 import ProductDetail from './pages/ProductDetail';
@@ -157,6 +158,8 @@ const App: React.FC = () => {
         return <About />;
       case '/products':
         return <Products products={products} categories={categories} onNavigate={navigate} />;
+      case '/blog':
+        return <Blog />;
       case '/contact':
         return <Contact />;
       case '/admin':

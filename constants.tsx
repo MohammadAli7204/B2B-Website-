@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Shield, Award, Activity, RefreshCw } from 'lucide-react';
-import { Product, Testimonial, Stat } from './types';
+import { Product, Testimonial, Stat, BlogPost } from './types';
 
 const STANDARD_SIZE_CHART = [
   { label: 'XXXS', inches: '30-32', cm: '76-81' },
@@ -18,8 +18,42 @@ const STANDARD_SIZE_CHART = [
 export const NAV_LINKS = [
   { label: 'Home', path: '/' },
   { label: 'Products', path: '/products' },
+  { label: 'Blog', path: '/blog' },
   { label: 'About', path: '/about' },
   { label: 'Contact', path: '/contact' },
+];
+
+export const BLOG_POSTS: BlogPost[] = [
+  {
+    id: '1',
+    title: 'The Evolution of AAMI Level Protection',
+    excerpt: 'Understanding the technical differences between barrier levels and their impact on clinical safety.',
+    content: 'The AAMI (Association for the Advancement of Medical Instrumentation) PB70 standard is the industry benchmark for liquid barrier performance and classification of protective apparel and drapes intended for use in healthcare facilities. This guide explores how manufacturers like SteriPro achieve these benchmarks through ultrasonic seam technology and specialized SMS fabric layering.',
+    author: 'Dr. Elena Rossi',
+    date: 'March 15, 2024',
+    category: 'Technical',
+    image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=800'
+  },
+  {
+    id: '2',
+    title: 'Sustainability in Medical Textiles',
+    excerpt: 'How reusable garments are reducing hospital waste without compromising on sterility.',
+    content: 'Medical waste is a growing global concern. While disposable garments offer immediate convenience, the environmental impact is significant. Our research into reusable medical textiles shows that with modern carbon-fiber integration and high-durability polyester blends, hospitals can maintain the same level of safety for up to 75 laundry cycles, significantly reducing their carbon footprint.',
+    author: 'James Miller',
+    date: 'March 10, 2024',
+    category: 'Sustainability',
+    image: 'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?auto=format&fit=crop&q=80&w=800'
+  },
+  {
+    id: '3',
+    title: 'Global Supply Chain Resiliency',
+    excerpt: 'Lessons learned from clinical apparel manufacturing during global healthcare surges.',
+    content: 'Direct-to-hospital manufacturing is no longer just an option; it is a necessity for supply chain stability. By controlling the entire production process from raw fabric sourcing to final sterilization, SteriPro ensures that healthcare facilities receive consistent quality even during periods of high global demand.',
+    author: 'Sarah Jenkins',
+    date: 'March 5, 2024',
+    category: 'Industry',
+    image: 'https://images.unsplash.com/photo-1558346490-a72e53ae2d4f?auto=format&fit=crop&q=80&w=800'
+  }
 ];
 
 export const PRODUCTS: Product[] = [

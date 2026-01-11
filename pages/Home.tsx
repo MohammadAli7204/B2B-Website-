@@ -3,6 +3,7 @@ import React from 'react';
 import { ChevronRight, ShieldCheck, Zap, Globe, Microscope, ArrowRight, RefreshCw, Trash2, ExternalLink, Award } from 'lucide-react';
 import { STATS, PRODUCTS } from '../constants';
 import SectionTitle from '../components/SectionTitle';
+import CertificatesSlider from '../components/CertificatesSlider';
 
 interface HomeProps {
   onNavigate: (page: string) => void;
@@ -259,6 +260,9 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
           </div>
         </div>
       </section>
+
+      {/* ISO Certificates Slider - Home Page Only */}
+      <CertificatesSlider />
     </div>
   );
 };
