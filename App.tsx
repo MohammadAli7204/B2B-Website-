@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Search } from 'lucide-react';
+import { Search, WifiOff, Cloud } from 'lucide-react';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
@@ -29,12 +29,12 @@ const App: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [dbConnected, setDbConnected] = useState<boolean>(false);
   const [cloudSynced, setCloudSynced] = useState<boolean>(false);
+  const [isOfflineMode, setIsOfflineMode] = useState<boolean>(false);
   
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [inquiries, setInquiries] = useState<InquiryData[]>([]);
 
-  // Auth State Listener
   useEffect(() => {
     if (!isConfigured) {
       setLoading(false);
@@ -43,9 +43,7 @@ const App: React.FC = () => {
     
     supabase.auth.getSession().then(({ data: { session } }) => {
       setIsAdminAuthenticated(!!session);
-    }).catch(() => {
-      // Fail silently for session checks to avoid noise
-    });
+    }).catch(() => {});
     
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setIsAdminAuthenticated(!!session);
@@ -54,77 +52,58 @@ const App: React.FC = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Central Data Synchronization Engine
   const fetchData = useCallback(async () => {
     if (!isConfigured) {
       setProducts(INITIAL_PRODUCTS);
       setCategories(INITIAL_CATEGORIES);
       setLoading(false);
-      setDbConnected(false);
       return;
     }
     
     try {
-      // Use a timeout or signal to prevent infinite 'pending' on bad connections
       const { data, error } = await supabase
         .from('careguard')
         .select('*')
         .order('created_at', { ascending: false });
       
-      if (error) {
-        // Handle specific errors like table missing (42P01)
-        if (error.code === '42P01') {
-          console.warn('API Warning: "careguard" table missing. Defaulting to local assets.');
-        } else {
-          throw error;
-        }
-      }
+      if (error) throw error;
 
       if (data) {
         setDbConnected(true);
+        setIsOfflineMode(false);
         const p: Product[] = [];
         const c: Category[] = [];
         const i: InquiryData[] = [];
 
         data.forEach(record => {
           const payload = record.payload || {};
-          if (record.type === 'product') {
-            p.push({ ...payload, id: record.id });
-          } else if (record.type === 'category') {
-            c.push({ id: record.id, name: payload.name || 'Uncategorized' });
-          } else if (record.type === 'inquiry') {
-            i.push({ ...payload, id: record.id, timestamp: record.created_at });
-          }
+          if (record.type === 'product') p.push({ ...payload, id: record.id });
+          else if (record.type === 'category') c.push({ id: record.id, name: payload.name });
+          else if (record.type === 'inquiry') i.push({ ...payload, id: record.id, timestamp: record.created_at });
         });
 
-        // Merging strategy: Cloud data takes precedence if it exists
-        setProducts(p.length > 0 ? p.sort((a, b) => a.name.localeCompare(b.name)) : INITIAL_PRODUCTS);
-        setCategories(c.length > 0 ? c.sort((a, b) => a.name.localeCompare(b.name)) : INITIAL_CATEGORIES);
+        setProducts(p.length > 0 ? p : INITIAL_PRODUCTS);
+        setCategories(c.length > 0 ? c : INITIAL_CATEGORIES);
         setInquiries(i);
         setCloudSynced(true);
       }
     } catch (error: any) {
       setDbConnected(false);
-      // Suppress noisy 'Failed to fetch' error in console for better UX in dev/restricted environments
-      if (!error.message?.includes('Failed to fetch')) {
-        console.error('API Handshake Failed:', error.message);
+      if (error.message === 'Failed to fetch') {
+        setIsOfflineMode(true);
       }
-      
-      // Always fallback to initial constants on first failure to avoid blank screen
-      if (!cloudSynced) {
-        setProducts(INITIAL_PRODUCTS);
-        setCategories(INITIAL_CATEGORIES);
-      }
+      // Fallback to constants on fetch error
+      setProducts(INITIAL_PRODUCTS);
+      setCategories(INITIAL_CATEGORIES);
     } finally {
       setLoading(false);
     }
-  }, [cloudSynced]);
+  }, []);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
-  // Client-side Routing Logic
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.replace('#', '') || '/';
@@ -140,14 +119,13 @@ const App: React.FC = () => {
     window.location.hash = path;
   };
 
-  // Auth Operations
   const handleLogin = async (email: string, pass: string) => {
     try {
       const { data, error } = await supabase.auth.signInWithPassword({ email, password: pass });
       if (error) return { success: false, message: error.message };
       return { success: !!data.user };
     } catch (err) {
-      return { success: false, message: 'Institutional network error.' };
+      return { success: false, message: 'Authentication Service Unreachable' };
     }
   };
 
@@ -155,12 +133,9 @@ const App: React.FC = () => {
     try {
       const { data, error } = await supabase.auth.signUp({ email, password: pass });
       if (error) return { success: false, message: error.message };
-      const message = data.session 
-        ? 'Account synchronized.' 
-        : 'Credentials recorded. Please verify your email via the link sent.';
-      return { success: true, message };
+      return { success: true, message: 'Identity Created. Verify via Email.' };
     } catch (err) {
-      return { success: false, message: 'Registry failure.' };
+      return { success: false, message: 'Registry Failure' };
     }
   };
 
@@ -170,7 +145,7 @@ const App: React.FC = () => {
     navigate('/');
   };
 
-  // CRUD Operations with Table-Level Checks
+  // CRUD Operations (Cloud-Synced)
   const handleAddProduct = async (product: Product) => {
     const { id, ...payload } = product;
     const { error } = await supabase.from('careguard').insert([{ type: 'product', payload }]);
@@ -180,24 +155,15 @@ const App: React.FC = () => {
 
   const handleUpdateProduct = async (product: Product) => {
     const { id, ...payload } = product;
-    const isCloudRecord = id.length > 10;
-    
-    if (!isCloudRecord) {
-      await handleAddProduct(product);
-    } else {
-      const { error } = await supabase.from('careguard').update({ payload }).eq('id', id);
-      if (error) throw error;
-      await fetchData();
-    }
+    const { error } = await supabase.from('careguard').update({ payload }).eq('id', id);
+    if (error) throw error;
+    await fetchData();
   };
 
   const handleDeleteProduct = async (id: string) => {
-    const isCloudRecord = id.length > 10;
-    if (isCloudRecord) {
-      const { error } = await supabase.from('careguard').delete().eq('id', id);
-      if (error) throw error;
-    }
-    setProducts(prev => prev.filter(p => p.id !== id));
+    const { error } = await supabase.from('careguard').delete().eq('id', id);
+    if (error) throw error;
+    await fetchData();
   };
 
   const handleAddCategory = async (name: string) => {
@@ -207,12 +173,9 @@ const App: React.FC = () => {
   };
 
   const handleDeleteCategory = async (id: string) => {
-    const isCloudRecord = id.length > 10;
-    if (isCloudRecord) {
-      const { error } = await supabase.from('careguard').delete().eq('id', id);
-      if (error) throw error;
-    }
-    setCategories(prev => prev.filter(c => c.id !== id));
+    const { error } = await supabase.from('careguard').delete().eq('id', id);
+    if (error) throw error;
+    await fetchData();
   };
 
   const handleAddInquiry = async (inq: InquiryData) => {
@@ -225,30 +188,20 @@ const App: React.FC = () => {
   const handleDeleteInquiry = async (id: string) => {
     const { error } = await supabase.from('careguard').delete().eq('id', id);
     if (error) throw error;
-    setInquiries(prev => prev.filter(i => i.id !== id));
+    await fetchData();
   };
 
-  // Page Component Router
   const renderPage = () => {
     if (currentPage.startsWith('/product/')) {
       const id = currentPage.split('/')[2];
       const product = products.find(p => p.id === id);
-      return product ? <ProductDetail product={product} onNavigate={navigate} /> : (
-        <div className="pt-40 text-center flex flex-col items-center gap-6">
-          <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center text-slate-300">
-            <Search size={32} />
-          </div>
-          <p className="font-black uppercase tracking-widest text-slate-300">Unit Missing in Ledger</p>
-        </div>
-      );
+      return product ? <ProductDetail product={product} onNavigate={navigate} /> : <div className="pt-40 text-center uppercase font-black text-slate-300">Unit Missing</div>;
     }
     
     if (currentPage.startsWith('/inquiry/')) {
       const id = currentPage.split('/')[2];
       const product = products.find(p => p.id === id);
-      return product ? <Inquiry product={product} onAddInquiry={handleAddInquiry} /> : (
-        <div className="pt-40 text-center font-black uppercase tracking-widest text-slate-300">Inquiry Target Invalid</div>
-      );
+      return product ? <Inquiry product={product} onAddInquiry={handleAddInquiry} /> : <div className="pt-40 text-center uppercase font-black text-slate-300">Target Invalid</div>;
     }
 
     switch (currentPage) {
@@ -283,12 +236,17 @@ const App: React.FC = () => {
   return (
     <div className="relative min-h-screen">
       <CursorFollower />
+      {isOfflineMode && (
+        <div className="fixed top-0 left-0 right-0 z-[60] bg-amber-600 text-white text-[10px] font-black uppercase tracking-widest py-1.5 flex items-center justify-center gap-2 animate-in slide-in-from-top duration-500">
+          <WifiOff size={12} /> Cloud Link Interrupted - Using Institutional Fallback Data
+        </div>
+      )}
       <Navbar currentPage={currentPage} onNavigate={navigate} isAdmin={isAdminAuthenticated} onLogout={handleLogout} />
-      <main className="min-h-[calc(100vh-400px)]">
-        {loading && !cloudSynced && isConfigured ? (
-          <div className="pt-60 flex flex-col items-center justify-center animate-pulse">
+      <main className="min-h-screen">
+        {loading ? (
+          <div className="h-screen flex flex-col items-center justify-center">
             <div className="w-12 h-12 border-4 border-red-600 border-t-transparent rounded-full animate-spin"></div>
-            <p className="mt-4 text-slate-400 font-bold uppercase tracking-widest text-xs">Accessing Secure Cloud Link...</p>
+            <p className="mt-4 text-slate-400 font-bold uppercase tracking-widest text-[10px]">Synchronizing Ledger...</p>
           </div>
         ) : renderPage()}
       </main>

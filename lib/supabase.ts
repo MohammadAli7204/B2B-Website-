@@ -1,25 +1,15 @@
 import { createClient } from '@supabase/supabase-js';
 
-/**
- * Environment variables for Supabase connection.
- * Prioritizes Vite-standard 'VITE_' prefix for production builds.
- */
 const getEnv = (key: string): string => {
   const vKey = `VITE_${key}`;
-  
-  // Try Vite meta env (standard for modern React/Vite builds)
   const metaEnv = (import.meta as any).env;
   if (metaEnv) {
     if (metaEnv[vKey]) return metaEnv[vKey];
     if (metaEnv[key]) return metaEnv[key];
   }
 
-  // Fallbacks for specific project identity
   const fallbacks: Record<string, string> = {
     'SUPABASE_URL': 'https://bosrulfjzhoqzjrsnxyr.supabase.co',
-    // Note: The previous key was likely invalid. 
-    // Replacing with a placeholder format or keeping the user-provided one.
-    // If you see 'Failed to fetch', ensure the URL and Key are correct in your Supabase Dashboard.
     'SUPABASE_ANON_KEY': 'sb_publishable_DCkI-xqaNYulXUZCPHK0Tg_Z2ETXtyf'
   };
 
@@ -29,21 +19,12 @@ const getEnv = (key: string): string => {
 export const supabaseUrl = getEnv('SUPABASE_URL');
 export const supabaseAnonKey = getEnv('SUPABASE_ANON_KEY');
 
-/**
- * Robust check to see if the client can actually initialize.
- * Valid Supabase Anon Keys usually start with 'eyJ' (JWT).
- */
 export const isConfigured = Boolean(
   supabaseUrl && 
   supabaseAnonKey && 
-  supabaseUrl.includes('supabase.co') &&
-  !supabaseUrl.includes('placeholder')
+  supabaseUrl.includes('supabase.co')
 );
 
-/**
- * Initialize client with safer defaults to prevent 'Failed to fetch' 
- * during initialization when environment is restricted.
- */
 export const supabase = createClient(
   supabaseUrl || 'https://placeholder.supabase.co',
   supabaseAnonKey || 'placeholder-key',
@@ -54,5 +35,29 @@ export const supabase = createClient(
     }
   }
 );
+
+/**
+ * Diagnostic tool to check if the API is reachable.
+ * Helps debug 'Failed to fetch' issues.
+ */
+export const testConnection = async () => {
+  if (!isConfigured) return { success: false, message: 'Configuration Missing' };
+  try {
+    const start = Date.now();
+    const { data, error } = await supabase.from('careguard').select('id').limit(1);
+    const latency = Date.now() - start;
+    
+    if (error) {
+      if (error.code === '42P01') return { success: true, message: 'Connected, but Table Missing', latency };
+      throw error;
+    }
+    return { success: true, message: 'Operational', latency };
+  } catch (err: any) {
+    return { 
+      success: false, 
+      message: err.message === 'Failed to fetch' ? 'Network Blocked (CORS/Offline)' : err.message 
+    };
+  }
+};
 
 export default supabase;
