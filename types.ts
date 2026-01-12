@@ -7,6 +7,11 @@ export interface SizeChartEntry {
   cm: string;
 }
 
+export interface Category {
+  id: string;
+  name: string;
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -34,11 +39,6 @@ export interface BlogPost {
   image: string;
 }
 
-/**
- * Fix: Added company field to InquiryData interface.
- * This resolves TypeScript errors in Admin.tsx where inq.company was being accessed
- * for both CSV export and table display.
- */
 export interface InquiryData {
   id: string;
   productId: string;

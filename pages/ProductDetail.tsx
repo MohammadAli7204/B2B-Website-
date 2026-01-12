@@ -19,7 +19,12 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, onNavigate }) =>
     return [product.image, ...(product.extraImages || [])];
   }, [product]);
 
-  const sizes = ['S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
+  const sizes = useMemo(() => {
+    if (product.sizeChart && product.sizeChart.length > 0) {
+      return product.sizeChart.map(s => s.label);
+    }
+    return ['S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
+  }, [product.sizeChart]);
 
   return (
     <div className="pt-24 pb-20 bg-white animate-in fade-in duration-500">
@@ -157,7 +162,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, onNavigate }) =>
           <div className="bg-white rounded shadow-2xl w-full max-w-2xl overflow-hidden transform animate-in zoom-in duration-300">
              {/* Header */}
              <div className="flex items-center justify-between border-b px-6 py-4">
-                <h3 className="text-lg font-medium text-slate-900">Size</h3>
+                <h3 className="text-lg font-medium text-slate-900">Size Specifications</h3>
                 <button onClick={() => setIsSizeModalOpen(false)} className="text-slate-400 hover:text-slate-900 transition-colors p-1 border hover:bg-slate-50">
                    <X size={20} />
                 </button>
@@ -169,7 +174,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, onNavigate }) =>
                    <table className="w-full text-center text-sm">
                       <thead className="bg-black text-white text-[10px] font-bold uppercase tracking-widest">
                          <tr>
-                            <th className="px-4 py-4 border-r border-white/20">To Fit Chest Size</th>
+                            <th className="px-4 py-4 border-r border-white/20">Label</th>
                             <th className="px-4 py-4 border-r border-white/20">Inches</th>
                             <th className="px-4 py-4">CM</th>
                          </tr>

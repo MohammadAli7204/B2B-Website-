@@ -1,5 +1,6 @@
+
 import React from 'react';
-import { Mail, Phone, MapPin, Linkedin, Twitter, Facebook, ArrowRight, FileText, Globe } from 'lucide-react';
+import { Mail, Phone, MapPin, Linkedin, Twitter, Facebook, ArrowRight, FileText, Globe, Settings, Lock } from 'lucide-react';
 
 interface FooterProps {
   onNavigate: (path: string) => void;
@@ -12,8 +13,12 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
           <div className="space-y-6">
             <div className="flex items-center cursor-pointer group" onClick={() => onNavigate('/')}>
-              <div className="w-8 h-8 bg-red-600 rounded flex items-center justify-center mr-2 group-hover:bg-red-700 transition-colors">
-                <span className="text-white font-bold">C</span>
+              <div className="w-10 h-10 mr-3 group-hover:scale-110 transition-transform duration-300">
+                <img 
+                  src="./images/logo.svg" 
+                  alt="CareGuard Logo" 
+                  className="w-full h-full shadow-md shadow-red-100 rounded-lg object-contain" 
+                />
               </div>
               <span className="text-xl font-bold text-slate-900 tracking-tight">
                 Care<span className="text-red-600">Guard</span>
@@ -50,7 +55,14 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
             <ul className="space-y-4 text-sm font-medium">
               <li><button onClick={() => onNavigate('/blog')} className="hover:text-red-600 transition-colors flex items-center gap-2"><FileText size={14} /> Knowledge Base</button></li>
               <li><button onClick={() => onNavigate('/contact')} className="hover:text-red-600 transition-colors flex items-center gap-2"><Globe size={14} /> Technical Support</button></li>
-              <li><button onClick={() => onNavigate('/products')} className="hover:text-red-600 transition-colors">Sitemap</button></li>
+              <li>
+                <button 
+                  onClick={() => onNavigate('/admin')} 
+                  className="hover:text-red-600 transition-colors flex items-center gap-2 text-slate-400 group"
+                >
+                  <Lock size={14} className="group-hover:text-red-600" /> Admin Console
+                </button>
+              </li>
             </ul>
           </div>
 

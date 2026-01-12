@@ -2,12 +2,12 @@
 import React from 'react';
 
 const CERTIFICATES = [
-  { name: 'ISO 13485:2016', label: 'Medical Devices QMS', icon: '/images/cert-iso.svg' },
-  { name: 'CE MARK', label: 'European Compliance', icon: '/images/cert-ce.svg' },
-  { name: 'AAMI PB70', label: 'Barrier Protection', icon: '/images/cert-aami.svg' },
+  { name: 'ISO 13485:2016', label: 'Medical Devices QMS', icon: 'images/cert-iso.svg' },
+  { name: 'CE MARK', label: 'European Compliance', icon: 'images/cert-ce.svg' },
+  { name: 'AAMI PB70', label: 'Barrier Protection', icon: 'images/cert-aami.svg' },
   { name: 'FDA REGISTERED', label: 'US Food & Drug Admin', icon: 'https://images.unsplash.com/photo-1614850523296-d8c1af93d400?auto=format&fit=crop&q=80&w=200' },
   { name: 'GMP CERTIFIED', label: 'Good Manufacturing', icon: 'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?auto=format&fit=crop&q=80&w=200' },
-  { name: 'ISO 9001:2015', label: 'Quality Management', icon: '/images/cert-iso.svg' },
+  { name: 'ISO 9001:2015', label: 'Quality Management', icon: 'images/cert-iso.svg' },
   { name: 'OEKO-TEX', label: 'Textile Safety', icon: 'https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?auto=format&fit=crop&q=80&w=200' },
 ];
 

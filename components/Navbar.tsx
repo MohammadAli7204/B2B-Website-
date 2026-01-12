@@ -34,8 +34,12 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate, isAdmin, onLog
             className="flex items-center cursor-pointer group"
             onClick={() => onNavigate('/')}
           >
-            <div className="mr-3 group-hover:scale-110 transition-transform duration-300">
-              <img src="/images/logo.svg" alt="CareGuard Logo" className="w-10 h-10 shadow-lg shadow-red-200 rounded-lg" />
+            <div className="mr-3 w-10 h-10 group-hover:scale-110 transition-transform duration-300">
+              <img 
+                src="./images/logo.svg" 
+                alt="CareGuard Logo" 
+                className="w-full h-full shadow-lg shadow-red-200 rounded-lg object-contain" 
+              />
             </div>
             <span className="text-2xl font-bold tracking-tight text-slate-900">
               Care<span className="text-red-600">Guard</span>
