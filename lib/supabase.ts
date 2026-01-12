@@ -1,49 +1,42 @@
-
 import { createClient } from 'https://esm.sh/@supabase/supabase-js';
 
 /**
  * Environment variables for Supabase connection.
- * Checks for both standard Vite/Next.js naming conventions and the specific keys provided by the user.
+ * Prioritizes process.env for the execution context.
  */
 const getEnv = (key: string): string => {
-  const possibleKeys = [
-    key,
-    `VITE_${key}`,
-    `NEXT_PUBLIC_${key}`,
-    key.replace('ANON_KEY', 'PUBLISHABLE_DEFAULT_KEY'),
-    `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY`
-  ];
+  // Hardcoded fallback based on project identity provided by user
+  const fallbacks: Record<string, string> = {
+    'SUPABASE_URL': 'https://bosrulfjzhoqzjrsnxyr.supabase.co',
+    'SUPABASE_ANON_KEY': 'sb_publishable_DCkI-xqaNYulXUZCPHK0Tg_Z2ETXtyf'
+  };
 
-  if (typeof process !== 'undefined' && process.env) {
-    for (const k of possibleKeys) {
-      if (process.env[k]) return process.env[k] as string;
-    }
+  if (typeof process !== 'undefined' && process.env && process.env[key]) {
+    return process.env[key] as string;
   }
   
   const metaEnv = (import.meta as any).env;
-  if (metaEnv) {
-    for (const k of possibleKeys) {
-      if (metaEnv[k]) return metaEnv[k];
-    }
+  if (metaEnv && metaEnv[key]) {
+    return metaEnv[key];
   }
 
-  // Hardcoded Fallback for this specific project instance based on user input
-  if (key === 'SUPABASE_URL') return 'https://bosrulfjzhoqzjrsnxyr.supabase.co';
-  if (key === 'SUPABASE_ANON_KEY') return 'sb_publishable_DCkI-xqaNYulXUZCPHK0Tg_Z2ETXtyf';
-
-  return '';
+  return fallbacks[key] || '';
 };
 
 export const supabaseUrl = getEnv('SUPABASE_URL');
 export const supabaseAnonKey = getEnv('SUPABASE_ANON_KEY');
 
 /**
- * Verification state
+ * Configuration state
  */
-export const isConfigured = Boolean(supabaseUrl && supabaseAnonKey && !supabaseUrl.includes('placeholder'));
+export const isConfigured = Boolean(
+  supabaseUrl && 
+  supabaseAnonKey && 
+  !supabaseUrl.includes('placeholder')
+);
 
 /**
- * Initialize client with safety defaults to prevent "url is required" crash
+ * Initialize client
  */
 export const supabase = createClient(
   supabaseUrl || 'https://placeholder.supabase.co',
