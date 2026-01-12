@@ -1,7 +1,6 @@
-
 import React from 'react';
 import SectionTitle from '../components/SectionTitle';
-import { Target, Eye, Heart, ShieldCheck, RefreshCw, Trash2 } from 'lucide-react';
+import { Target, Eye, Heart, ShieldCheck, RefreshCw, Trash2, CheckCircle, AlertTriangle, Code, Cpu } from 'lucide-react';
 
 const About: React.FC = () => {
   return (
@@ -75,6 +74,83 @@ const About: React.FC = () => {
             <p className="text-slate-600 leading-relaxed">Providing clinicians with garments that are not just protective, but ergonomically designed for long-duration procedures.</p>
           </div>
         </div>
+
+        {/* Pros & Cons Analysis Section */}
+        <section className="mb-32">
+          <div className="text-center mb-16">
+            <span className="text-red-600 font-black uppercase tracking-[0.4em] text-[10px] mb-4 block">Platform Analysis</span>
+            <h2 className="text-4xl font-black text-slate-900 mb-6 tracking-tight">System Strengths & Limitations</h2>
+            <p className="text-slate-500 max-w-2xl mx-auto font-medium">A transparent look at our B2B procurement platform architecture and clinical deployment strategy.</p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+            {/* Pros */}
+            <div className="bg-emerald-50/50 rounded-[3rem] p-10 lg:p-16 border border-emerald-100">
+              <div className="flex items-center gap-4 mb-10">
+                <div className="w-12 h-12 bg-emerald-100 rounded-2xl flex items-center justify-center text-emerald-600">
+                  <CheckCircle size={24} />
+                </div>
+                <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tight">Platform Pros</h3>
+              </div>
+              <ul className="space-y-6">
+                <li className="flex gap-4">
+                  <div className="mt-1 w-5 h-5 bg-emerald-500 rounded-full flex-shrink-0 flex items-center justify-center text-white text-[10px] font-bold">1</div>
+                  <div>
+                    <p className="font-bold text-slate-900 mb-1">Real-Time Ledger Sync</p>
+                    <p className="text-sm text-slate-600 leading-relaxed">Direct integration with Supabase ensures that inventory updates and procurement requests are synchronized across all administrative terminals instantly.</p>
+                  </div>
+                </li>
+                <li className="flex gap-4">
+                  <div className="mt-1 w-5 h-5 bg-emerald-500 rounded-full flex-shrink-0 flex items-center justify-center text-white text-[10px] font-bold">2</div>
+                  <div>
+                    <p className="font-bold text-slate-900 mb-1">Hybrid Data Strategy</p>
+                    <p className="text-sm text-slate-600 leading-relaxed">The 'Offline-First' architecture allows the catalog to remain visible even during clinical network outages using local constants as an intelligent fallback.</p>
+                  </div>
+                </li>
+                <li className="flex gap-4">
+                  <div className="mt-1 w-5 h-5 bg-emerald-500 rounded-full flex-shrink-0 flex items-center justify-center text-white text-[10px] font-bold">3</div>
+                  <div>
+                    <p className="font-bold text-slate-900 mb-1">Institutional Security</p>
+                    <p className="text-sm text-slate-600 leading-relaxed">Row Level Security (RLS) ensures that sensitive procurement data is isolated and only accessible to verified procurement officers.</p>
+                  </div>
+                </li>
+              </ul>
+            </div>
+
+            {/* Cons */}
+            <div className="bg-amber-50/50 rounded-[3rem] p-10 lg:p-16 border border-amber-100">
+              <div className="flex items-center gap-4 mb-10">
+                <div className="w-12 h-12 bg-amber-100 rounded-2xl flex items-center justify-center text-amber-600">
+                  <AlertTriangle size={24} />
+                </div>
+                <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tight">System Cons</h3>
+              </div>
+              <ul className="space-y-6">
+                <li className="flex gap-4">
+                  <div className="mt-1 w-5 h-5 bg-amber-500 rounded-full flex-shrink-0 flex items-center justify-center text-white text-[10px] font-bold">1</div>
+                  <div>
+                    <p className="font-bold text-slate-900 mb-1">Initial Setup Overhead</p>
+                    <p className="text-sm text-slate-600 leading-relaxed">Full cloud persistence requires an initial SQL schema migration (the 'careguard' table) which can be a barrier for non-technical facility managers.</p>
+                  </div>
+                </li>
+                <li className="flex gap-4">
+                  <div className="mt-1 w-5 h-5 bg-amber-500 rounded-full flex-shrink-0 flex items-center justify-center text-white text-[10px] font-bold">2</div>
+                  <div>
+                    <p className="font-bold text-slate-900 mb-1">Vendor Dependency</p>
+                    <p className="text-sm text-slate-600 leading-relaxed">The architecture is tightly coupled with Supabase PostgreSQL services. Migrating to an on-premise hospital server requires code-level refactoring.</p>
+                  </div>
+                </li>
+                <li className="flex gap-4">
+                  <div className="mt-1 w-5 h-5 bg-amber-500 rounded-full flex-shrink-0 flex items-center justify-center text-white text-[10px] font-bold">3</div>
+                  <div>
+                    <p className="font-bold text-slate-900 mb-1">Fetch Latency</p>
+                    <p className="text-sm text-slate-600 leading-relaxed">Direct API calls for large institutional catalogs may experience 'handshake' delays on high-latency hospital Wi-Fi networks compared to static builds.</p>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
 
         {/* Quality Section */}
         <div className="bg-slate-900 rounded-[3rem] p-12 lg:p-20 text-white flex flex-col lg:flex-row items-center gap-16">

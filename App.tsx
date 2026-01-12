@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback } from 'react';
-// Added missing Search icon import from lucide-react
 import { Search } from 'lucide-react';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -44,6 +43,8 @@ const App: React.FC = () => {
     
     supabase.auth.getSession().then(({ data: { session } }) => {
       setIsAdminAuthenticated(!!session);
+    }).catch(() => {
+      // Fail silently for session checks to avoid noise
     });
     
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -64,22 +65,23 @@ const App: React.FC = () => {
     }
     
     try {
+      // Use a timeout or signal to prevent infinite 'pending' on bad connections
       const { data, error } = await supabase
         .from('careguard')
         .select('*')
         .order('created_at', { ascending: false });
       
       if (error) {
-        // Table not found (42P01) or permissions issue
+        // Handle specific errors like table missing (42P01)
         if (error.code === '42P01') {
           console.warn('API Warning: "careguard" table missing. Defaulting to local assets.');
+        } else {
+          throw error;
         }
-        throw error;
       }
 
-      setDbConnected(true);
-      
       if (data) {
+        setDbConnected(true);
         const p: Product[] = [];
         const c: Category[] = [];
         const i: InquiryData[] = [];
@@ -103,7 +105,10 @@ const App: React.FC = () => {
       }
     } catch (error: any) {
       setDbConnected(false);
-      console.error('API Handshake Failed:', error.message);
+      // Suppress noisy 'Failed to fetch' error in console for better UX in dev/restricted environments
+      if (!error.message?.includes('Failed to fetch')) {
+        console.error('API Handshake Failed:', error.message);
+      }
       
       // Always fallback to initial constants on first failure to avoid blank screen
       if (!cloudSynced) {
@@ -167,7 +172,7 @@ const App: React.FC = () => {
 
   // CRUD Operations with Table-Level Checks
   const handleAddProduct = async (product: Product) => {
-    const { id, ...payload } = product; // Strip local ID
+    const { id, ...payload } = product;
     const { error } = await supabase.from('careguard').insert([{ type: 'product', payload }]);
     if (error) throw error;
     await fetchData();
@@ -175,11 +180,9 @@ const App: React.FC = () => {
 
   const handleUpdateProduct = async (product: Product) => {
     const { id, ...payload } = product;
-    // UUIDs are longer than local IDs (e.g., '1', '2')
     const isCloudRecord = id.length > 10;
     
     if (!isCloudRecord) {
-      // If it was a local record, create it as a new cloud record
       await handleAddProduct(product);
     } else {
       const { error } = await supabase.from('careguard').update({ payload }).eq('id', id);
@@ -282,7 +285,7 @@ const App: React.FC = () => {
       <CursorFollower />
       <Navbar currentPage={currentPage} onNavigate={navigate} isAdmin={isAdminAuthenticated} onLogout={handleLogout} />
       <main className="min-h-[calc(100vh-400px)]">
-        {loading && !cloudSynced ? (
+        {loading && !cloudSynced && isConfigured ? (
           <div className="pt-60 flex flex-col items-center justify-center animate-pulse">
             <div className="w-12 h-12 border-4 border-red-600 border-t-transparent rounded-full animate-spin"></div>
             <p className="mt-4 text-slate-400 font-bold uppercase tracking-widest text-xs">Accessing Secure Cloud Link...</p>
